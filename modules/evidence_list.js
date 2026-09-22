@@ -1,5 +1,12 @@
 import { openEvidenceDetail } from "./evidence_detail.js";
-import { evidenceMentionsPerson, findEvidenceById, findPersonById, formatDate, getRelevanceBadgeClass, getStatusBadgeClass } from "./lookup_helpers.js";
+import {
+  evidenceMentionsPerson,
+  findEvidenceById,
+  findPersonById,
+  formatDate,
+  getRelevanceBadgeClass,
+  getStatusBadgeClass,
+} from "./lookup_helpers.js";
 import { saveBookmarksToStorage } from "./notes_storage.js";
 import { state } from "./state.js";
 
@@ -25,12 +32,20 @@ export function populateEvidenceDropdowns() {
 
   personSelect.innerHTML = '<option value="">All people</option>';
   for (let p = 0; p < state.allPeople.length; p++) {
-    personSelect.innerHTML += '<option value="' + state.allPeople[p].id + '">' + state.allPeople[p].name + "</option>";
+    personSelect.innerHTML +=
+      '<option value="' + state.allPeople[p].id + '">' + state.allPeople[p].name + "</option>";
   }
 
   locationSelect.innerHTML = '<option value="">All locations</option>';
   for (let l = 0; l < state.allLocations.length; l++) {
-    locationSelect.innerHTML += '<option value="' + state.allLocations[l].id + '">' + state.allLocations[l].id + " - " + state.allLocations[l].name + "</option>";
+    locationSelect.innerHTML +=
+      '<option value="' +
+      state.allLocations[l].id +
+      '">' +
+      state.allLocations[l].id +
+      " - " +
+      state.allLocations[l].name +
+      "</option>";
   }
 }
 
@@ -59,7 +74,8 @@ function getFilteredEvidence() {
     }
     if (matches && locationVal && item.locationIds.indexOf(locationVal) === -1) matches = false;
     if (matches && statusVal && (item.status || "").toLowerCase() !== statusVal) matches = false;
-    if (matches && relevanceVal && (item.relevance || "").toLowerCase() !== relevanceVal) matches = false;
+    if (matches && relevanceVal && (item.relevance || "").toLowerCase() !== relevanceVal)
+      matches = false;
 
     if (matches) results.push(item);
   }
@@ -105,16 +121,33 @@ export function renderEvidenceList() {
 function renderEvidenceCardHTML(ev) {
   const isBookmarked = state.bookmarks.indexOf(ev.id) !== -1;
   let html = '<div class="evidence-card" data-id="' + ev.id + '">';
-  html += '<button class="bookmark-btn ' + (isBookmarked ? "active" : "") + '" data-action="bookmark" data-id="' + ev.id + '" aria-label="Toggle bookmark for ' + ev.title + '"><span class="bookmark-icon">' + (isBookmarked ? "★" : "☆") + "</span></button>";
+  html +=
+    '<button class="bookmark-btn ' +
+    (isBookmarked ? "active" : "") +
+    '" data-action="bookmark" data-id="' +
+    ev.id +
+    '" aria-label="Toggle bookmark for ' +
+    ev.title +
+    '"><span class="bookmark-icon">' +
+    (isBookmarked ? "★" : "☆") +
+    "</span></button>";
   html += "<h3>" + ev.title + "</h3>";
-  html += '<div class="evidence-meta">' + ev.id + " &middot; " + ev.type + " &middot; " + formatDate(ev.timestamp) + "</div>";
+  html +=
+    '<div class="evidence-meta">' +
+    ev.id +
+    " &middot; " +
+    ev.type +
+    " &middot; " +
+    formatDate(ev.timestamp) +
+    "</div>";
   html += '<div class="evidence-summary">' + ev.summary + "</div>";
 
   if (ev.tags.indexOf("critical") !== -1) {
     html += '<span class="badge badge-critical">Critical</span>';
   }
   html += '<span class="badge ' + getStatusBadgeClass(ev.status) + '">' + ev.status + "</span>";
-  html += '<span class="badge ' + getRelevanceBadgeClass(ev.relevance) + '">' + ev.relevance + "</span>";
+  html +=
+    '<span class="badge ' + getRelevanceBadgeClass(ev.relevance) + '">' + ev.relevance + "</span>";
   html += "<div>";
   for (let t = 0; t < ev.tags.length; t++) {
     html += '<span class="tag-chip">' + ev.tags[t] + "</span>";
@@ -204,11 +237,12 @@ export function clearFilters() {
   renderEvidenceList();
 }
 
-const simulateAsyncSearch = (term) => new Promise((resolve) => {
-  setTimeout(() => {
-    resolve(term);
-  }, 300);
-});
+const simulateAsyncSearch = (term) =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(term);
+    }, 300);
+  });
 
 let latestSearchRequestId = 0;
 
@@ -216,7 +250,7 @@ export function handleSearchInput(event) {
   const term = event.target.value;
   const requestId = ++latestSearchRequestId;
 
-  simulateAsyncSearch(term).then((resolvedTerm) => {
+  simulateAsyncSearch(term).then(() => {
     // Only apply this response if nothing newer has been typed meanwhile.
     if (requestId !== latestSearchRequestId) return;
     renderEvidenceList();

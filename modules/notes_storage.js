@@ -12,9 +12,15 @@ export function loadBookmarksFromStorage() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_BOOKMARKS);
     const parsed = raw ? JSON.parse(raw) : [];
-    state.bookmarks = Array.isArray(parsed) ? Array.from(new Set(parsed.filter(function (id) {
-      return typeof id === "string";
-    }))) : [];
+    state.bookmarks = Array.isArray(parsed)
+      ? Array.from(
+          new Set(
+            parsed.filter(function (id) {
+              return typeof id === "string";
+            }),
+          ),
+        )
+      : [];
   } catch (err) {
     console.warn("Could not read stored bookmarks, starting empty", err);
     state.bookmarks = [];

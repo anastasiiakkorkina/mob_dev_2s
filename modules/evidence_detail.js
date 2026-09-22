@@ -1,5 +1,10 @@
 import { renderEvidenceList } from "./evidence_list.js";
-import { findEvidenceById, findLocationById, findPersonById, formatDate } from "./lookup_helpers.js";
+import {
+  findEvidenceById,
+  findLocationById,
+  findPersonById,
+  formatDate,
+} from "./lookup_helpers.js";
 import { loadNoteForEvidence, saveNoteForEvidence } from "./notes_storage.js";
 import { state } from "./state.js";
 
@@ -51,8 +56,16 @@ function renderEvidenceDetail(ev) {
   let html = "";
   html += '<div class="evidence-detail-header">';
   html += "<div><h2>" + ev.title + "</h2>";
-  html += '<div class="evidence-meta">' + ev.id + " &middot; " + ev.type + " &middot; " + formatDate(ev.timestamp) + "</div></div>";
-  html += '<button type="button" class="btn btn-secondary btn-small" onclick="closeEvidenceDetail()">Close</button>';
+  html +=
+    '<div class="evidence-meta">' +
+    ev.id +
+    " &middot; " +
+    ev.type +
+    " &middot; " +
+    formatDate(ev.timestamp) +
+    "</div></div>";
+  html +=
+    '<button type="button" class="btn btn-secondary btn-small" onclick="closeEvidenceDetail()">Close</button>';
   html += "</div>";
 
   if (ev.tags.indexOf("critical") !== -1) {
@@ -61,8 +74,12 @@ function renderEvidenceDetail(ev) {
 
   html += '<div class="detail-field"><strong>Summary</strong>' + ev.summary + "</div>";
   html += '<div class="evidence-detail-content">' + ev.content + "</div>";
-  html += '<div class="detail-field"><strong>Related people</strong>' + personNames.join(", ") + "</div>";
-  html += '<div class="detail-field"><strong>Related locations</strong>' + locationNames.join(", ") + "</div>";
+  html +=
+    '<div class="detail-field"><strong>Related people</strong>' + personNames.join(", ") + "</div>";
+  html +=
+    '<div class="detail-field"><strong>Related locations</strong>' +
+    locationNames.join(", ") +
+    "</div>";
   html += '<div class="detail-field"><strong>Tags</strong>' + tagsHtml + "</div>";
 
   html += '<div class="detail-field"><strong>Review status</strong>';
@@ -80,11 +97,16 @@ function renderEvidenceDetail(ev) {
   html += "</select></div>";
 
   html += '<div class="detail-field"><strong>Investigator note</strong>';
-  html += '<textarea id="evidenceNoteInput" class="note-textarea" rows="3" data-evidence-id="' + ev.id + '" placeholder="Add a private note about this evidence..."></textarea>';
-  html += '<button type="button" class="btn btn-primary btn-small" style="margin-top:6px;" onclick="saveCurrentNote()">Save note</button>';
+  html +=
+    '<textarea id="evidenceNoteInput" class="note-textarea" rows="3" data-evidence-id="' +
+    ev.id +
+    '" placeholder="Add a private note about this evidence..."></textarea>';
+  html +=
+    '<button type="button" class="btn btn-primary btn-small" style="margin-top:6px;" onclick="saveCurrentNote()">Save note</button>';
   html += "</div>";
 
-  html += '<div class="detail-field"><strong>Note preview</strong><div id="notePreview"></div></div>';
+  html +=
+    '<div class="detail-field"><strong>Note preview</strong><div id="notePreview"></div></div>';
 
   section.innerHTML = html;
   document.getElementById("evidenceNoteInput").value = storedNote;

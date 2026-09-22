@@ -19,11 +19,7 @@
     "name": "Kernel Colt",
     "role": "Legacy Systems Engineer",
     "speciality": "Old operating environments, embedded systems, and unusual legacy tools",
-    "responsibilities": [
-      "Motor controller",
-      "Embedded interfaces",
-      "Legacy diagnostic software"
-    ],
+    "responsibilities": ["Motor controller", "Embedded interfaces", "Legacy diagnostic software"],
     "statement": "I installed the approved MCU-BRIDGE-4.7 compatibility patch like I was asked to. I did not touch any calibration values, only the controller firmware bridge. My diagnostic rig still thinks it's 2024 half the time, don't read too much into the timestamps.",
     "background": "Kernel installed an approved compatibility patch shortly before the failure. His diagnostic software generated confusing timestamps, and a controller flash log shows a write operation that his own statement does not fully account for.",
     "avatar": "assets/people/kernel-colt.png"
@@ -48,12 +44,7 @@
     "name": "Patch Vector",
     "role": "Software Quality Specialist",
     "speciality": "Testing, code review, and release validation",
-    "responsibilities": [
-      "Testing",
-      "Code review",
-      "Debugging",
-      "Release validation"
-    ],
+    "responsibilities": ["Testing", "Code review", "Debugging", "Release validation"],
     "statement": "I flagged the calibration-cache reuse risk days before the demonstration and recommended we postpone until it was fixed properly. I was overruled. I don't think anyone took the risk as seriously as they should have.",
     "background": "Patch previously warned that calibration data might be incorrectly reused between robots and argued that the public demonstration should be postponed until the caching behaviour was fixed.",
     "avatar": "assets/people/patch-vector.png"

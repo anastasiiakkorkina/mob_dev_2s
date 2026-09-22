@@ -1,5 +1,9 @@
 import { renderDashboard } from "./dashboard.js";
-import { applyStoredBookmarkFlags, populateEvidenceDropdowns, renderEvidenceList } from "./evidence_list.js";
+import {
+  applyStoredBookmarkFlags,
+  populateEvidenceDropdowns,
+  renderEvidenceList,
+} from "./evidence_list.js";
 import { state } from "./state.js";
 import { populateTimelineDropdowns, renderTimeline } from "./timeline.js";
 import { populateHypothesisDropdowns } from "./workspace.js";
@@ -83,7 +87,8 @@ export async function loadAllData() {
     document.getElementById("loadingOverlay").classList.add("hidden");
   } catch (err) {
     console.error("Failed to load case data", err);
-    document.getElementById("loadingText").textContent = "Case data could not be loaded. Please reload the page.";
+    document.getElementById("loadingText").textContent =
+      "Case data could not be loaded. Please reload the page.";
     document.querySelector("#loadingOverlay .spinner").classList.add("hidden");
   }
 }

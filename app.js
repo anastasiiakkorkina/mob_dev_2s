@@ -3,7 +3,11 @@ import { setupEventListeners } from "./modules/event_listener.js";
 import { closeEvidenceDetail, saveCurrentNote } from "./modules/evidence_detail.js";
 import { handleSortChange, renderEvidenceList } from "./modules/evidence_list.js";
 import { handleHashChange, navigateTo } from "./modules/navigation.js";
-import { loadBookmarksFromStorage, loadNoteAsync, loadNotesFromStorage } from "./modules/notes_storage.js";
+import {
+  loadBookmarksFromStorage,
+  loadNoteAsync,
+  loadNotesFromStorage,
+} from "./modules/notes_storage.js";
 import { switchPeopleTab } from "./modules/people_locations.js";
 import { saveHypothesis } from "./modules/workspace.js";
 
@@ -16,7 +20,7 @@ Object.assign(window, {
   saveHypothesis,
   closeEvidenceDetail,
   saveCurrentNote,
-  renderEvidenceList
+  renderEvidenceList,
 });
 
 async function initApp() {

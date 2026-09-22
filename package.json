@@ -10,6 +10,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "lint": "eslint app.js modules",
+    "lint:fix": "eslint app.js modules --fix",
+    "format": "prettier --write app.js modules data styles.css package.json",
     "preview": "vite preview",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -30,6 +33,11 @@
   },
   "homepage": "https://github.com/anastasiiakkorkina/mob_dev_2s#readme",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.11.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.12.0",
+    "prettier": "^3.9.8",
     "vite": "^8.3.0"
   }
 }

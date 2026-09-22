@@ -19,9 +19,9 @@ export const state = {
     evidence: false,
     people: false,
     timeline: false,
-    workspace: false
+    workspace: false,
   },
-  notesStore: {}
+  notesStore: {},
 };
 
 export const STORAGE_KEY_BOOKMARKS = "remotion_bookmarks";

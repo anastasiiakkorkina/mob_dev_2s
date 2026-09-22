@@ -14,12 +14,18 @@ export function renderDashboard() {
     if ((state.allEvidence[i].status || "").toLowerCase() === "reviewed") reviewedCount++;
   }
 
-  const progressPct = state.allEvidence.length === 0 ? 0 : Math.round((reviewedCount / state.allEvidence.length) * 100);
+  const progressPct =
+    state.allEvidence.length === 0
+      ? 0
+      : Math.round((reviewedCount / state.allEvidence.length) * 100);
 
   let html = "";
   html += '<div class="case-summary-card">';
   html += "<h3>" + (state.caseData.title || "Case") + "</h3>";
-  html += '<p><span class="badge badge-flagged">' + (state.caseData.status || "unknown").toUpperCase() + "</span></p>";
+  html +=
+    '<p><span class="badge badge-flagged">' +
+    (state.caseData.status || "unknown").toUpperCase() +
+    "</span></p>";
   html += "<p>" + (state.caseData.summary || "") + "</p>";
   html += "</div>";
 
@@ -33,23 +39,37 @@ export function renderDashboard() {
 
   html += '<div class="dashboard-panel">';
   html += "<h3>Review progress</h3>";
-  html += '<div class="progress-bar-outer"><div class="progress-bar-inner" style="width:' + progressPct + '%;"></div></div>';
+  html +=
+    '<div class="progress-bar-outer"><div class="progress-bar-inner" style="width:' +
+    progressPct +
+    '%;"></div></div>';
   html += "<p>" + progressPct + "% of evidence reviewed</p>";
   html += "</div>";
 
   html += '<div class="dashboard-columns">';
 
   html += '<div class="dashboard-panel"><h3>Recent evidence</h3>';
-  const recentEvidence = state.allEvidence.slice().sort(function (a, b) {
-    return new Date(b.timestamp) - new Date(a.timestamp);
-  }).slice(0, 5);
+  const recentEvidence = state.allEvidence
+    .slice()
+    .sort(function (a, b) {
+      return new Date(b.timestamp) - new Date(a.timestamp);
+    })
+    .slice(0, 5);
   if (recentEvidence.length === 0) {
     html += "<p>No evidence loaded yet.</p>";
   }
   for (let e = 0; e < recentEvidence.length; e++) {
     const ev = recentEvidence[e];
-    html += '<div class="mini-list-item"><strong>' + ev.id + "</strong> &mdash; " + ev.title +
-      ' <span class="badge ' + getStatusBadgeClass(ev.status) + '">' + ev.status + "</span></div>";
+    html +=
+      '<div class="mini-list-item"><strong>' +
+      ev.id +
+      "</strong> &mdash; " +
+      ev.title +
+      ' <span class="badge ' +
+      getStatusBadgeClass(ev.status) +
+      '">' +
+      ev.status +
+      "</span></div>";
   }
   html += "</div>";
 
@@ -60,15 +80,26 @@ export function renderDashboard() {
   }
   for (let t = 0; t < recentTimeline.length; t++) {
     const evt = recentTimeline[t];
-    html += '<div class="mini-list-item"><strong>' + formatDate(evt.time) + "</strong><br>" + evt.title + "</div>";
+    html +=
+      '<div class="mini-list-item"><strong>' +
+      formatDate(evt.time) +
+      "</strong><br>" +
+      evt.title +
+      "</div>";
   }
   html += "</div>";
 
   html += "</div>"; // dashboard-columns
 
   container.innerHTML = html;
-};
+}
 
 const statCardHTML = (value, label) => {
-  return '<div class="stat-card"><div class="stat-value">' + value + '</div><div class="stat-label">' + label + "</div></div>";
+  return (
+    '<div class="stat-card"><div class="stat-value">' +
+    value +
+    '</div><div class="stat-label">' +
+    label +
+    "</div></div>"
+  );
 };

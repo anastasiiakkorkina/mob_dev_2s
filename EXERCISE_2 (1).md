@@ -141,15 +141,28 @@ the modules, created hashed filenames, and produced a browser-ready asset layout
 
 **Tasks**
 
-- [ ] Install and configure a linter (e.g. ESLint) and a formatter (e.g. Prettier) for this TypeScript/JS project.
-- [ ] Add these scripts to `package.json`: `dev`, `build`, `lint`, `lint:fix`, `format`. Each one must actually do something real when run, not just print a placeholder.
-- [ ] Run `lint` and show it catching at least one real issue in your code (introduce one on purpose if you have to). Run `lint:fix` and/or `format` and show it actually changing a file.
+- [x] Install and configure a linter (e.g. ESLint) and a formatter (e.g. Prettier) for this TypeScript/JS project.
+- [x] Add these scripts to `package.json`: `dev`, `build`, `lint`, `lint:fix`, `format`. Each one must actually do something real when run, not just print a placeholder.
+- [x] Run `lint` and show it catching at least one real issue in your code (introduce one on purpose if you have to). Run `lint:fix` and/or `format` and show it actually changing a file.
+
+**Demo 4 verification:** I installed ESLint and Prettier as project devDependencies.
+ESLint first found one real error: `resolvedTerm` was defined but never used in
+`modules/evidence_list.js`, plus warnings for diagnostic `console.log` calls. I
+removed the unused parameter. Prettier then reformatted the JavaScript modules,
+CSS, and JSON files. The final lint run has 0 errors and 9 warnings, and the build
+still passes.
 
 **Questions** (depend on the tasks above)
 
-- [ ] What's the difference between what a linter checks/fixes and what a formatter checks/fixes? Give one concrete finding from each tool on this codebase.
-- [ ] Why are `lint` and `lint:fix` two separate scripts instead of one script that always auto-fixes? When would you deliberately want the non-fixing version?
-- [ ] What does `npm run lint` (or `pnpm lint`) actually do under the hood? Where does npm/pnpm look for the `lint` command, and would it work if your linter weren't installed as a project dependency (only globally on your machine)?
+- [x] What's the difference between what a linter checks/fixes and what a formatter checks/fixes? Give one concrete finding from each tool on this codebase.
+- [x] Why are `lint` and `lint:fix` two separate scripts instead of one script that always auto-fixes? When would you deliberately want the non-fixing version?
+- [x] What does `npm run lint` (or `pnpm lint`) actually do under the hood? Where does npm/pnpm look for the `lint` command, and would it work if your linter weren't installed as a project dependency (only globally on your machine)?
+
+**Answers (simple English):**
+
+- A linter checks code for problems and possible bugs. ESLint found the unused `resolvedTerm` parameter. A formatter only changes style and layout. Prettier reformatted long lines and spacing in the modules.
+- `lint` checks without changing files. `lint:fix` may change code automatically. The separate non-fixing command is useful in CI and code review, where we want to detect problems without changing a developer's files.
+- `npm run lint` reads the `lint` script from `package.json` and runs the local ESLint executable from `node_modules/.bin`. It works because ESLint is installed in this project. A global-only installation is not reliable for teammates or CI, because they may not have the same global tool or version.
 
 ---
 
