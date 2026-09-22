@@ -1,7 +1,7 @@
 import { clearFilters, renderEvidenceList } from "./evidence_list.js";
-import { evidenceMentionsPerson } from "./lookup_helpers.js";
+import { evidenceMentionsPerson } from "./lookup_helpers";
 import { navigateTo } from "./navigation.js";
-import { state } from "./state.js";
+import { state } from "./state";
 
 // ---------------------------------------------------------------------
 // PEOPLE & LOCATIONS

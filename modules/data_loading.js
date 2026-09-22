@@ -4,7 +4,7 @@ import {
   populateEvidenceDropdowns,
   renderEvidenceList,
 } from "./evidence_list.js";
-import { state } from "./state.js";
+import { state } from "./state";
 import { populateTimelineDropdowns, renderTimeline } from "./timeline.js";
 import { populateHypothesisDropdowns } from "./workspace.js";
 

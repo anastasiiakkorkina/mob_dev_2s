@@ -1,5 +1,5 @@
-import { formatDate, getStatusBadgeClass } from "./lookup_helpers.js";
-import { state } from "./state.js";
+import { formatDate, getStatusBadgeClass } from "./lookup_helpers";
+import { state } from "./state";
 
 // ---------------------------------------------------------------------
 // DASHBOARD

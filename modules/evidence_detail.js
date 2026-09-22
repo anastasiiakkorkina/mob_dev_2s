@@ -4,9 +4,9 @@ import {
   findLocationById,
   findPersonById,
   formatDate,
-} from "./lookup_helpers.js";
-import { loadNoteForEvidence, saveNoteForEvidence } from "./notes_storage.js";
-import { state } from "./state.js";
+} from "./lookup_helpers";
+import { loadNoteForEvidence, saveNoteForEvidence } from "./notes_storage";
+import { state } from "./state";
 
 // ---------------------------------------------------------------------
 // EVIDENCE DETAIL

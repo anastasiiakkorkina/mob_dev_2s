@@ -7,7 +7,7 @@ import {
   loadBookmarksFromStorage,
   loadNoteAsync,
   loadNotesFromStorage,
-} from "./modules/notes_storage.js";
+} from "./modules/notes_storage";
 import { switchPeopleTab } from "./modules/people_locations.js";
 import { saveHypothesis } from "./modules/workspace.js";
 

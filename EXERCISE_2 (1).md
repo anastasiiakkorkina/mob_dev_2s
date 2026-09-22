@@ -170,15 +170,29 @@ still passes.
 
 **Tasks**
 
-- [ ] Install TypeScript and add a `tsconfig.json`. Deliberately choose your strictness settings (don't just copy a default blindly) and be ready to justify at least one setting you turned on or left off.
-- [ ] Convert 2–3 of your smallest/utility modules from Exercise 1 (e.g. formatting or lookup helpers) from `.js` to `.ts`, with **no `any`**, and get them compiling with zero errors.
-- [ ] Wire TypeScript into your `build`/`dev` scripts from Demo 4 so type errors are actually surfaced by your tooling, not just by your editor.
+- [x] Install TypeScript and add a `tsconfig.json`. Deliberately choose your strictness settings (don't just copy a default blindly) and be ready to justify at least one setting you turned on or left off.
+- [x] Convert 2–3 of your smallest/utility modules from Exercise 1 (e.g. formatting or lookup helpers) from `.js` to `.ts`, with **no `any`**, and get them compiling with zero errors.
+- [x] Wire TypeScript into your `build`/`dev` scripts from Demo 4 so type errors are actually surfaced by your tooling, not just by your editor.
+
+**Demo 5 verification:** I installed TypeScript and added `tsconfig.json` with
+`strict: true`, `noEmit: true`, ES2022 modules, DOM types, and bundler module
+resolution. I converted `state.js`, `lookup_helpers.js`, and `notes_storage.js`
+to typed `state.ts`, `lookup_helpers.ts`, and `notes_storage.ts`; no `any` is used.
+The old JS copies were removed and all imports now use the TypeScript modules.
+Both `npm run dev` and `npm run build` run `tsc --noEmit` before Vite, so type
+errors stop the command before the app starts or builds.
 
 **Questions** (depend on the tasks above)
 
-- [ ] What does the `strict` option in `tsconfig.json` actually turn on? Name at least two individual checks bundled under it, and say whether you kept it on and why.
-- [ ] What is the difference between a compile-time type error and the runtime bugs you fixed in Exercise 1? Could TypeScript alone have caught any of those specific bugs? Why or why not?
-- [ ] What does `any` do to TypeScript's checking for a value, and why did you avoid it in this first pass even though it would have been faster to just silence the errors with it?
+- [x] What does the `strict` option in `tsconfig.json` actually turn on? Name at least two individual checks bundled under it, and say whether you kept it on and why.
+- [x] What is the difference between a compile-time type error and the runtime bugs you fixed in Exercise 1? Could TypeScript alone have caught any of those specific bugs? Why or why not?
+- [x] What does `any` do to TypeScript's checking for a value, and why did you avoid it in this first pass even though it would have been faster to just silence the errors with it?
+
+**Answers (simple English):**
+
+- `strict` enables stronger checks, including `strictNullChecks` and `noImplicitAny`. I kept it on because it catches unsafe values early. `noEmit` is used because Vite is responsible for the final browser build.
+- A compile-time type error is found before the program runs. A runtime bug happens while the app is running. TypeScript could catch mistakes such as using a value with the wrong type, but it cannot by itself catch every wrong value inside a JSON file or every UI behavior bug.
+- `any` turns off most type checking for a value. I avoided it because it hides mistakes and makes the TypeScript migration less useful. I used specific interfaces and types instead.
 
 ---
 

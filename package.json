@@ -8,8 +8,8 @@
     "test": "tests"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "tsc --noEmit && vite",
+    "build": "tsc --noEmit && vite build",
     "lint": "eslint app.js modules",
     "lint:fix": "eslint app.js modules --fix",
     "format": "prettier --write app.js modules data styles.css package.json",
@@ -38,6 +38,8 @@
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.12.0",
     "prettier": "^3.9.8",
+    "typescript": "^6.0.0",
+    "typescript": "^7.0.2",
     "vite": "^8.3.0"
   }
 }

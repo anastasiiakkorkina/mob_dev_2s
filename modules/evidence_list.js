@@ -6,9 +6,9 @@ import {
   formatDate,
   getRelevanceBadgeClass,
   getStatusBadgeClass,
-} from "./lookup_helpers.js";
-import { saveBookmarksToStorage } from "./notes_storage.js";
-import { state } from "./state.js";
+} from "./lookup_helpers";
+import { saveBookmarksToStorage } from "./notes_storage";
+import { state } from "./state";
 
 // ---------------------------------------------------------------------
 // EVIDENCE CATALOGUE

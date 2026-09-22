@@ -1,7 +1,7 @@
 import { openEvidenceDetail } from "./evidence_detail.js";
-import { findEvidenceById, findLocationById, formatDate } from "./lookup_helpers.js";
+import { findEvidenceById, findLocationById, formatDate } from "./lookup_helpers";
 import { navigateTo } from "./navigation.js";
-import { state } from "./state.js";
+import { state } from "./state";
 
 // ---------------------------------------------------------------------
 // TIMELINE

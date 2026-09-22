@@ -1,7 +1,7 @@
 import { renderDashboard } from "./dashboard.js";
 import { renderEvidenceList } from "./evidence_list.js";
 import { renderLocations, renderPeople } from "./people_locations.js";
-import { state } from "./state.js";
+import { state } from "./state";
 import { renderTimeline } from "./timeline.js";
 import { renderWorkspace } from "./workspace.js";
 

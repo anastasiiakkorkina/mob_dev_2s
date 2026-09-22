@@ -1,6 +1,6 @@
 import { openEvidenceDetail } from "./evidence_detail.js";
 import { navigateTo } from "./navigation.js";
-import { STORAGE_KEY_HYPOTHESIS, state } from "./state.js";
+import { STORAGE_KEY_HYPOTHESIS, state } from "./state";
 
 // ---------------------------------------------------------------------
 // WORKSPACE
