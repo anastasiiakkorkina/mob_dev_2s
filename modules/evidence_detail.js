@@ -8,11 +8,11 @@ import { state } from "./state.js";
 // ---------------------------------------------------------------------
 
 export function openEvidenceDetail(evidenceId) {
-  var ev = findEvidenceById(evidenceId);
+  const ev = findEvidenceById(evidenceId);
   if (!ev) return;
   state.selectedEvidence = ev;
 
-  var section = document.getElementById("evidenceDetailSection");
+  const section = document.getElementById("evidenceDetailSection");
   section.classList.remove("hidden");
 
   renderEvidenceDetail(ev);
@@ -20,35 +20,35 @@ export function openEvidenceDetail(evidenceId) {
 }
 
 export function closeEvidenceDetail() {
-  var section = document.getElementById("evidenceDetailSection");
+  const section = document.getElementById("evidenceDetailSection");
   section.classList.add("hidden");
   section.innerHTML = "";
   state.selectedEvidence = null;
 }
 
 function renderEvidenceDetail(ev) {
-  var section = document.getElementById("evidenceDetailSection");
+  const section = document.getElementById("evidenceDetailSection");
 
-  var personNames = [];
-  for (var p = 0; p < ev.personIds.length; p++) {
-    var person = findPersonById(ev.personIds[p]);
+  const personNames = [];
+  for (let p = 0; p < ev.personIds.length; p++) {
+    const person = findPersonById(ev.personIds[p]);
     personNames.push(person ? person.name : ev.personIds[p]);
   }
 
-  var locationNames = [];
-  for (var l = 0; l < ev.locationIds.length; l++) {
-    var loc = findLocationById(ev.locationIds[l]);
+  const locationNames = [];
+  for (let l = 0; l < ev.locationIds.length; l++) {
+    const loc = findLocationById(ev.locationIds[l]);
     locationNames.push(loc ? loc.id + " - " + loc.name : ev.locationIds[l]);
   }
 
-  var tagsHtml = "";
-  for (var t = 0; t < ev.tags.length; t++) {
+  let tagsHtml = "";
+  for (let t = 0; t < ev.tags.length; t++) {
     tagsHtml += '<span class="tag-chip">' + ev.tags[t] + "</span>";
   }
 
-  var storedNote = loadNoteForEvidence(ev.id);
+  const storedNote = loadNoteForEvidence(ev.id);
 
-  var html = "";
+  let html = "";
   html += '<div class="evidence-detail-header">';
   html += "<div><h2>" + ev.title + "</h2>";
   html += '<div class="evidence-meta">' + ev.id + " &middot; " + ev.type + " &middot; " + formatDate(ev.timestamp) + "</div></div>";
@@ -101,17 +101,17 @@ function renderEvidenceDetail(ev) {
 }
 
 function statusOptionHTML(current, value, label) {
-  var currentLower = (current || "").toLowerCase();
-  var selected = currentLower === value ? " selected" : "";
+  const currentLower = (current || "").toLowerCase();
+  const selected = currentLower === value ? " selected" : "";
   return '<option value="' + value + '"' + selected + ">" + label + "</option>";
 }
 
 export function saveCurrentNote() {
-  var textarea = document.getElementById("evidenceNoteInput");
+  const textarea = document.getElementById("evidenceNoteInput");
   if (!textarea) return;
-  var evidenceId = textarea.getAttribute("data-evidence-id"); // note id is read back off the DOM
-  var text = textarea.value;
+  const evidenceId = textarea.getAttribute("data-evidence-id"); // note id is read back off the DOM
+  const text = textarea.value;
   saveNoteForEvidence(evidenceId, text);
-  var preview = document.getElementById("notePreview");
+  const preview = document.getElementById("notePreview");
   if (preview) preview.textContent = text;
 }

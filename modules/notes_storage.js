@@ -10,8 +10,8 @@ export function saveBookmarksToStorage() {
 
 export function loadBookmarksFromStorage() {
   try {
-    var raw = localStorage.getItem(STORAGE_KEY_BOOKMARKS);
-    var parsed = raw ? JSON.parse(raw) : [];
+    const raw = localStorage.getItem(STORAGE_KEY_BOOKMARKS);
+    const parsed = raw ? JSON.parse(raw) : [];
     state.bookmarks = Array.isArray(parsed) ? Array.from(new Set(parsed.filter(function (id) {
       return typeof id === "string";
     }))) : [];
@@ -33,10 +33,10 @@ export function loadNoteForEvidence(evidenceId) {
 export function loadNotesFromStorage() {
   state.notesStore = {};
   try {
-    var raw = localStorage.getItem(STORAGE_KEY_NOTES);
-    var parsed = raw ? JSON.parse(raw) : {};
+    const raw = localStorage.getItem(STORAGE_KEY_NOTES);
+    const parsed = raw ? JSON.parse(raw) : {};
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return;
-    for (var id of Object.keys(parsed)) {
+    for (const id of Object.keys(parsed)) {
       if (/^E\d+$/.test(id) && typeof parsed[id] === "string") {
         state.notesStore[id] = parsed[id];
       }
