@@ -204,13 +204,11 @@ export function clearFilters() {
   renderEvidenceList();
 }
 
-function simulateAsyncSearch(term) {
-  return new Promise(function (resolve) {
-    setTimeout(function () {
-      resolve(term);
-    }, 300);
-  });
-}
+const simulateAsyncSearch = (term) => new Promise((resolve) => {
+  setTimeout(() => {
+    resolve(term);
+  }, 300);
+});
 
 let latestSearchRequestId = 0;
 
@@ -218,7 +216,7 @@ export function handleSearchInput(event) {
   const term = event.target.value;
   const requestId = ++latestSearchRequestId;
 
-  simulateAsyncSearch(term).then(function (resolvedTerm) {
+  simulateAsyncSearch(term).then((resolvedTerm) => {
     // Only apply this response if nothing newer has been typed meanwhile.
     if (requestId !== latestSearchRequestId) return;
     renderEvidenceList();

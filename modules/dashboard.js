@@ -67,8 +67,8 @@ export function renderDashboard() {
   html += "</div>"; // dashboard-columns
 
   container.innerHTML = html;
-}
+};
 
-function statCardHTML(value, label) {
+const statCardHTML = (value, label) => {
   return '<div class="stat-card"><div class="stat-value">' + value + '</div><div class="stat-label">' + label + "</div></div>";
-}
+};
