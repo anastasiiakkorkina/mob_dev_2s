@@ -1,10 +1,5 @@
 import { renderEvidenceList } from "./evidence_list.js";
-import {
-  findEvidenceById,
-  findLocationById,
-  findPersonById,
-  formatDate,
-} from "./lookup_helpers";
+import { findEvidenceById, findLocationById, findPersonById, formatDate } from "./lookup_helpers";
 import { loadNoteForEvidence, saveNoteForEvidence } from "./notes_storage";
 import { state } from "./state";
 

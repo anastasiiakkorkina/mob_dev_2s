@@ -200,15 +200,32 @@ errors stop the command before the app starts or builds.
 
 **Tasks**
 
-- [ ] Define TypeScript types/interfaces for the case's data model (evidence, people, locations, timeline events) that match the shape of `data/*.json`.
-- [ ] Convert your data-loading module to use these types instead of untyped `fetch().json()` results.
-- [ ] Pick one field that was genuinely ambiguous or inconsistent in the original JavaScript version (for example: something that could be either an id or a display name, or a date stored in more than one format) and show what modeling it as a proper TypeScript type forced you to decide.
+- [x] Define TypeScript types/interfaces for the case's data model (evidence, people, locations, timeline events) that match the shape of `data/*.json`.
+- [x] Convert your data-loading module to use these types instead of untyped `fetch().json()` results.
+- [x] Pick one field that was genuinely ambiguous or inconsistent in the original JavaScript version (for example: something that could be either an id or a display name, or a date stored in more than one format) and show what modeling it as a proper TypeScript type forced you to decide.
+
+**Demo 6 verification:** I added `CaseRecord`, `EvidenceRecord`, `PersonRecord`,
+`LocationRecord`, and `TimelineEvent` models in `modules/state.ts`. I also added
+`PersonId`, `LocationId`, and `EvidenceId` types. The old JavaScript data loader is
+now `modules/data_loading.ts`; its `fetchJson<T>()` helper loads typed results for
+all four JSON datasets. TypeScript checks it with `strict: true` and no errors.
+
+For the ambiguous field, I chose `evidence.personIds`. JavaScript accepted both
+`"nova-byte"` and the inconsistent display name `"Nova Byte"`, so the lookup code
+had to check both forms. I normalized the JSON data to use `"nova-byte"` and made
+`personIds` use the `PersonId` union type. The code now commits to stable IDs.
 
 **Questions** (depend on the tasks above)
 
-- [ ] Walk through the ambiguous field you picked: how did the JavaScript version get away without deciding on one shape, and what did TypeScript force you to commit to?
-- [ ] Is there a data-shape problem in this app that TypeScript's static types **can't** catch on their own, because the actual bad data would only show up at runtime from a JSON file, not from your code? What would you need in addition to types to catch that?
-- [ ] What's the difference between an `interface` and a `type` alias for an object shape in TypeScript? Which did you use for your domain models, and does it actually matter here?
+- [x] Walk through the ambiguous field you picked: how did the JavaScript version get away without deciding on one shape, and what did TypeScript force you to commit to?
+- [x] Is there a data-shape problem in this app that TypeScript's static types **can't** catch on their own, because the actual bad data would only show up at runtime from a JSON file, not from your code? What would you need in addition to types to catch that?
+- [x] What's the difference between an `interface` and a `type` alias for an object shape in TypeScript? Which did you use for your domain models, and does it actually matter here?
+
+**Answers (simple English):**
+
+- In JavaScript, `personIds` was just an array of strings, so both an ID and a person name were accepted. TypeScript made me choose one shape. I chose stable IDs and normalized `"Nova Byte"` to `"nova-byte"`.
+- TypeScript checks our code, not the real JSON contents at runtime. For example, a JSON file could contain a missing title or an invalid status. Runtime validation with a schema library such as Zod, or manual checks, would be needed to catch that.
+- An `interface` describes an object shape and can be extended or merged. A `type` alias can describe object shapes, unions, and other types. I used interfaces for the domain objects and type aliases for ID unions. For this small project, both could describe objects, so the practical difference is small.
 
 ---
 

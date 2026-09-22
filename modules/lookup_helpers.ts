@@ -12,13 +12,8 @@ export function findLocationById(id: string): LocationRecord | null {
   return state.allLocations.find((location) => location.id === id) ?? null;
 }
 
-export function evidenceMentionsPerson(
-  evidence: EvidenceRecord,
-  person: PersonRecord,
-): boolean {
-  return (
-    evidence.personIds.includes(person.id) || evidence.personIds.includes(person.name)
-  );
+export function evidenceMentionsPerson(evidence: EvidenceRecord, person: PersonRecord): boolean {
+  return evidence.personIds.includes(person.id);
 }
 
 export function formatDate(timestamp?: string | null): string {
