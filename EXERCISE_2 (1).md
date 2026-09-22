@@ -78,15 +78,28 @@ extra installation, and is the standard tool for this small vanilla-JavaScript p
 
 **Tasks**
 
-- [ ] Install Vite and configure it for this project (restructure files if needed so Vite can find `index.html`/your modules/the `data/` and `assets/` folders correctly).
-- [ ] Get `vite`'s dev server running the app with the same functionality it had before. Verify every view still works, not just that the page loads.
-- [ ] Trigger Hot Module Replacement at least once: change something in the running app's source and observe the update happen without a full page reload.
+- [x] Install Vite and configure it for this project (restructure files if needed so Vite can find `index.html`/your modules/the `data/` and `assets/` folders correctly).
+- [x] Get `vite`'s dev server running the app with the same functionality it had before. Verify every view still works, not just that the page loads.
+- [x] Trigger Hot Module Replacement at least once: change something in the running app's source and observe the update happen without a full page reload.
+
+**Demo 2 verification:** The project already had a root `index.html`, ES modules in
+`modules/`, and browser-accessible `data/` and `assets/` folders, so no file
+restructuring was needed. Vite ran the app at `http://127.0.0.1:5173/`. I opened
+Dashboard, Evidence, People & Locations, Timeline, and Workspace. I changed the
+background color in `styles.css`; Vite reported an HMR update, and the Workspace
+route and unsaved text in its form stayed on screen.
 
 **Questions** (depend on the tasks above)
 
-- [ ] What is the difference between how you used to run this app (a plain static file server) and running it through Vite's dev server? Name at least one thing Vite's dev server does that a plain static server doesn't.
-- [ ] What is Hot Module Replacement, and what specifically did you observe happen (and *not* happen, e.g. to app state) when you triggered it?
-- [ ] Why does an app already split into ES modules (Exercise 1) integrate naturally with a tool like Vite, compared to the original single-`<script>` version?
+- [x] What is the difference between how you used to run this app (a plain static file server) and running it through Vite's dev server? Name at least one thing Vite's dev server does that a plain static server doesn't.
+- [x] What is Hot Module Replacement, and what specifically did you observe happen (and *not* happen, e.g. to app state) when you triggered it?
+- [x] Why does an app already split into ES modules (Exercise 1) integrate naturally with a tool like Vite, compared to the original single-`<script>` version?
+
+**Answers (simple English):**
+
+- A plain static server only sends files to the browser. Vite also runs a development server that understands modules, reports build errors, and updates changed files quickly.
+- Hot Module Replacement (HMR) updates changed code in the running page without a full reload. I changed `styles.css`, saw the Vite HMR message, and the page style changed. The `#workspace` route and unsaved text in the form stayed there.
+- ES modules work naturally with Vite because each file has clear `import` and `export` links. Vite can follow these links, load only what is needed, and rebuild changed modules. A single script has no such module structure, so it is harder to manage and optimize.
 
 ---
 
