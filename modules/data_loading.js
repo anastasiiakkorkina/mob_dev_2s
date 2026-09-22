@@ -50,17 +50,22 @@ function loadCorePeopleAndLocations() {
 function loadEvidenceData() {
   fetch("data/evidence.json")
     .then(function (res) {
+      if (!res.ok) throw new Error("HTTP " + res.status);
       return res.json();
     })
     .then(function (data) {
       state.allEvidence = data;
       applyStoredBookmarkFlags();
-      state.filteredEvidence = state.allEvidence; 
+      state.filteredEvidence = state.allEvidence.slice();
+      state.evidenceViewLoading = false;
       renderDashboard();
       populateAllDropdowns();
       if (state.currentPage === "evidence") renderEvidenceList();
     })
     .catch(function (err) {
+      state.evidenceViewLoading = false;
+      state.evidenceLoadError = "Evidence could not be loaded. Please reload the page.";
+      if (state.currentPage === "evidence") renderEvidenceList();
       console.error("Failed to load evidence.json", err);
       alert("Evidence could not be loaded. Some views may be incomplete.");
     });
@@ -99,4 +104,3 @@ function populateAllDropdowns() {
   populateTimelineDropdowns();
   populateHypothesisDropdowns();
 }
-

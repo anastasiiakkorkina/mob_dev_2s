@@ -12,6 +12,7 @@ export const state = {
   currentPeopleTab: "people",
   loadingStepsRemaining: 2,
   evidenceViewLoading: true,
+  evidenceLoadError: "",
   viewRendered: {
     dashboard: false,
     evidence: false,

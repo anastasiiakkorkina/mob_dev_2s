@@ -79,8 +79,13 @@ export function renderEvidenceList() {
     return;
   }
   if (loadingIndicator) loadingIndicator.classList.add("hidden");
+  if (state.evidenceLoadError) {
+    container.textContent = state.evidenceLoadError;
+    return;
+  }
 
   var results = getFilteredEvidence();
+  sortEvidence(results);
 
   var html = "";
   if (results.length === 0) {
@@ -157,26 +162,30 @@ export function applyStoredBookmarkFlags() {
 }
 
 export function handleSortChange() {
+  renderEvidenceList();
+}
+
+// Sort only the new array returned by getFilteredEvidence, never the source.
+function sortEvidence(results) {
   var sortValue = document.getElementById("sortEvidence").value;
 
   if (sortValue === "title-asc") {
-    state.filteredEvidence.sort(function (a, b) {
+    results.sort(function (a, b) {
       return a.title.localeCompare(b.title);
     });
   } else if (sortValue === "title-desc") {
-    state.filteredEvidence.sort(function (a, b) {
+    results.sort(function (a, b) {
       return b.title.localeCompare(a.title);
     });
   } else if (sortValue === "date-asc") {
-    state.filteredEvidence.sort(function (a, b) {
+    results.sort(function (a, b) {
       return new Date(a.timestamp) - new Date(b.timestamp);
     });
   } else {
-    state.filteredEvidence.sort(function (a, b) {
+    results.sort(function (a, b) {
       return new Date(b.timestamp) - new Date(a.timestamp);
     });
   }
-  renderEvidenceList();
 }
 
 export function clearFilters() {
