@@ -1,4 +1,4 @@
-import { renderEvidenceList } from "./evidence_list.js";
+import { clearFilters, renderEvidenceList } from "./evidence_list.js";
 import { evidenceMentionsPerson } from "./lookup_helpers.js";
 import { navigateTo } from "./navigation.js";
 import { state } from "./state.js";
@@ -64,6 +64,7 @@ export function renderPeople() {
   for (var l = 0; l < links.length; l++) {
     links[l].addEventListener("click", function (e) {
       var personId = e.target.getAttribute("data-person-id");
+      clearFilters();
       document.getElementById("filterPerson").value = personId;
       navigateTo("evidence");
       setTimeout(function () {

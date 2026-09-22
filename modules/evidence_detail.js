@@ -80,22 +80,22 @@ function renderEvidenceDetail(ev) {
   html += "</select></div>";
 
   html += '<div class="detail-field"><strong>Investigator note</strong>';
-  html += '<textarea id="evidenceNoteInput" class="note-textarea" rows="3" data-evidence-id="' + ev.id + '" placeholder="Add a private note about this evidence...">' + storedNote + "</textarea>";
+  html += '<textarea id="evidenceNoteInput" class="note-textarea" rows="3" data-evidence-id="' + ev.id + '" placeholder="Add a private note about this evidence..."></textarea>';
   html += '<button type="button" class="btn btn-primary btn-small" style="margin-top:6px;" onclick="saveCurrentNote()">Save note</button>';
   html += "</div>";
 
-  html += '<div class="detail-field"><strong>Note preview</strong><div id="notePreview">' + storedNote + "</div></div>";
+  html += '<div class="detail-field"><strong>Note preview</strong><div id="notePreview"></div></div>';
 
   section.innerHTML = html;
+  document.getElementById("evidenceNoteInput").value = storedNote;
+  document.getElementById("notePreview").textContent = storedNote;
 
   document.getElementById("detailStatusSelect").addEventListener("change", function (e) {
     ev.status = e.target.value; // direct mutation of the loaded evidence object
-    renderEvidenceDetail(ev);
     if (state.viewRendered.evidence) renderEvidenceList();
   });
   document.getElementById("detailRelevanceSelect").addEventListener("change", function (e) {
     ev.relevance = e.target.value;
-    renderEvidenceDetail(ev);
     if (state.viewRendered.evidence) renderEvidenceList();
   });
 }
@@ -113,5 +113,5 @@ export function saveCurrentNote() {
   var text = textarea.value;
   saveNoteForEvidence(evidenceId, text);
   var preview = document.getElementById("notePreview");
-  if (preview) preview.innerHTML = text; // unsafe on purpose, see above
+  if (preview) preview.textContent = text;
 }

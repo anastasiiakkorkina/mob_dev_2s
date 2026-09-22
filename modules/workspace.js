@@ -67,9 +67,14 @@ function renderNotesList() {
   for (var n = 0; n < noteEntries.length; n++) {
     var entry = noteEntries[n];
     html += '<div class="mini-list-item"><strong>' + entry.evidenceId + "</strong> &mdash; " + entry.title;
-    html += '<div id="noteText-' + entry.index + '">' + entry.text + "</div></div>"; // unsafe innerHTML rendering, same as the note preview
+    html += '<div id="noteText-' + entry.index + '"></div></div>';
   }
   container.innerHTML = html;
+  // Populate the note text content after the container is in the DOM. DOM elements must exist before setting textContent, 
+  // otherwise it will fail silently. This is why we don't do it in the loop above.
+  for (var n = 0; n < noteEntries.length; n++) {
+    document.getElementById("noteText-" + noteEntries[n].index).textContent = noteEntries[n].text;
+  }
 }
 
 export function populateHypothesisDropdowns() {
@@ -89,6 +94,8 @@ export function populateHypothesisDropdowns() {
     evidenceSelect.innerHTML += '<option value="' + state.allEvidence[i].id + '">' + state.allEvidence[i].id + " - " + state.allEvidence[i].title + "</option>";
   }
 }
+
+var savedMessageTimer;
 
 export function saveHypothesis() {
   var draft = {
@@ -111,7 +118,8 @@ export function saveHypothesis() {
 
   var msg = document.getElementById("hypothesisSavedMsg");
   msg.classList.remove("hidden");
-  setTimeout(function () {
+  clearTimeout(savedMessageTimer);
+  savedMessageTimer = setTimeout(function () {
     msg.classList.add("hidden");
   }, 2000);
 }
@@ -125,20 +133,28 @@ function getSelectedOptions(selectEl) {
 }
 
 function loadHypothesisFromStorage() {
-  var raw = localStorage.getItem(STORAGE_KEY_HYPOTHESIS);
-  if (!raw) return;
-
-  var draft = JSON.parse(raw); 
+  var draft = {};
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY_HYPOTHESIS);
+    var parsed = raw ? JSON.parse(raw) : {};
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) draft = parsed;
+  } catch (err) {
+    console.warn("Could not read stored hypothesis, starting empty", err);
+  }
 
   document.getElementById("hypSuspect").value = draft.suspectId || "";
   document.getElementById("hypNature").value = draft.nature || "";
-  document.getElementById("hypConfidence").value = draft.confidence || 50;
-  document.getElementById("hypConfidenceValue").textContent = draft.confidence || 50;
-  document.getElementById("hypExplanation").value = draft.explanation || "";
-  document.getElementById("hypAlternative").value = draft.alternative || "";
+  var confidence = draft.confidence;
+  if (typeof confidence === "string" && confidence.trim() !== "") confidence = Number(confidence);
+  if (typeof confidence !== "number" || !Number.isFinite(confidence)) confidence = 50;
+  confidence = Math.round(Math.max(0, Math.min(100, confidence)));
+  document.getElementById("hypConfidence").value = confidence;
+  document.getElementById("hypConfidenceValue").textContent = confidence;
+  document.getElementById("hypExplanation").value = typeof draft.explanation === "string" ? draft.explanation : "";
+  document.getElementById("hypAlternative").value = typeof draft.alternative === "string" ? draft.alternative : "";
 
   var evidenceSelect = document.getElementById("hypEvidence");
-  var savedIds = draft.evidenceIds || [];
+  var savedIds = Array.isArray(draft.evidenceIds) ? draft.evidenceIds : [];
   for (var i = 0; i < evidenceSelect.options.length; i++) {
     evidenceSelect.options[i].selected = savedIds.indexOf(evidenceSelect.options[i].value) !== -1;
   }

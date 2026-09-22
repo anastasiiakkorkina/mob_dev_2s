@@ -26,8 +26,9 @@ function initApp() {
 
   loadAllData().then(function () {
     handleHashChange();
-    var firstNote = loadNoteAsync("E01");
-    console.log("First note preview:", firstNote);
+    return loadNoteAsync("E01").then(function (firstNote) {
+      console.log("First note preview:", firstNote);
+    });
   });
 }
 

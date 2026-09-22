@@ -40,7 +40,9 @@ export function renderDashboard() {
   html += '<div class="dashboard-columns">';
 
   html += '<div class="dashboard-panel"><h3>Recent evidence</h3>';
-  var recentEvidence = state.allEvidence.slice(-5).reverse();
+  var recentEvidence = state.allEvidence.slice().sort(function (a, b) {
+    return new Date(b.timestamp) - new Date(a.timestamp);
+  }).slice(0, 5);
   if (recentEvidence.length === 0) {
     html += "<p>No evidence loaded yet.</p>";
   }

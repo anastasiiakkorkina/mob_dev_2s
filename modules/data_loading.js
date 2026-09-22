@@ -15,28 +15,22 @@ function showLoadingOverlay(msg) {
   if (overlay) overlay.classList.remove("hidden");
 }
 
-function hideLoadingStep() {
-  state.loadingStepsRemaining--;
-  if (state.loadingStepsRemaining <= 0) {
-    var overlay = document.getElementById("loadingOverlay");
-    if (overlay) overlay.classList.add("hidden");
-  }
-}
-
 function loadCorePeopleAndLocations() {
   return fetch("data/case.json").then(function (caseRes) {
+    if (!caseRes.ok) throw new Error("case.json: HTTP " + caseRes.status);
     return caseRes.json().then(function (caseJson) {
       state.caseData = caseJson;
 
       return fetch("data/people.json").then(function (peopleRes) {
+        if (!peopleRes.ok) throw new Error("people.json: HTTP " + peopleRes.status);
         return peopleRes.json().then(function (peopleJson) {
           state.allPeople = peopleJson;
 
           return fetch("data/locations.json").then(function (locationsRes) {
+            if (!locationsRes.ok) throw new Error("locations.json: HTTP " + locationsRes.status);
             return locationsRes.json().then(function (locationsJson) {
               state.allLocations = locationsJson;
 
-              hideLoadingStep();
               renderDashboard();
               populateAllDropdowns();
             });
@@ -48,7 +42,7 @@ function loadCorePeopleAndLocations() {
 }
 
 function loadEvidenceData() {
-  fetch("data/evidence.json")
+  return fetch("data/evidence.json")
     .then(function (res) {
       if (!res.ok) throw new Error("HTTP " + res.status);
       return res.json();
@@ -74,6 +68,7 @@ function loadEvidenceData() {
 function loadTimelineData() {
   return fetch("data/timeline.json")
     .then(function (res) {
+      if (!res.ok) throw new Error("HTTP " + res.status);
       return res.json();
     })
     .then(function (data) {
@@ -83,19 +78,25 @@ function loadTimelineData() {
       populateAllDropdowns();
     })
     .catch(function (err) {
-      console.log("timeline load error", err);
-    })
-    .finally(function () {
-      hideLoadingStep();
+      state.timelineLoadError = "Timeline could not be loaded. Please reload the page.";
+      console.error("timeline load error", err);
     });
 }
 
 export function loadAllData() {
   showLoadingOverlay("Loading case file…");
-  state.loadingStepsRemaining = 2;
+  state.dataLoaded = false;
   return loadCorePeopleAndLocations().then(function () {
-    loadEvidenceData();
-    loadTimelineData();
+    return loadEvidenceData();
+  }).then(function () {
+    return loadTimelineData();
+  }).then(function () {
+    state.dataLoaded = true;
+    document.getElementById("loadingOverlay").classList.add("hidden");
+  }).catch(function (err) {
+    console.error("Failed to load case data", err);
+    document.getElementById("loadingText").textContent = "Case data could not be loaded. Please reload the page.";
+    document.querySelector("#loadingOverlay .spinner").classList.add("hidden");
   });
 }
 

@@ -156,6 +156,11 @@ function handleBookmarkClick(evidenceId) {
 }
 
 export function applyStoredBookmarkFlags() {
+  // Remove any bookmarks that no longer exist in the evidence list, 
+  // and update the bookmarked flags on the evidence items.
+  state.bookmarks = state.bookmarks.filter(function (id) {
+    return findEvidenceById(id) !== null;
+  });
   for (var i = 0; i < state.allEvidence.length; i++) {
     state.allEvidence[i].bookmarked = state.bookmarks.indexOf(state.allEvidence[i].id) !== -1;
   }

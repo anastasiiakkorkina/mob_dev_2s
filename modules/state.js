@@ -10,9 +10,10 @@ export const state = {
   allTimeline: [],
   caseData: {},
   currentPeopleTab: "people",
-  loadingStepsRemaining: 2,
+  dataLoaded: false,
   evidenceViewLoading: true,
   evidenceLoadError: "",
+  timelineLoadError: "",
   viewRendered: {
     dashboard: false,
     evidence: false,
@@ -20,8 +21,7 @@ export const state = {
     timeline: false,
     workspace: false
   },
-  notesStore: {},
-  modalCloseListenerCount: 0
+  notesStore: {}
 };
 
 export const STORAGE_KEY_BOOKMARKS = "remotion_bookmarks";

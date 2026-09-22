@@ -1,18 +1,16 @@
 import { clearFilters, handleSearchInput, renderEvidenceList } from "./evidence_list.js";
-import { handleHashChange } from "./navigation.js";
 import { renderTimeline } from "./timeline.js";
+import { saveHypothesis } from "./workspace.js";
 
 // ---------------------------------------------------------------------
 // EVENT LISTENER SETUP
 // ---------------------------------------------------------------------
 
 export function setupEventListeners() {
-  window.addEventListener("hashchange", handleHashChange);
-
   var navButtons = document.querySelectorAll(".nav-btn");
   for (var i = 0; i < navButtons.length; i++) {
-    navButtons[i].addEventListener("click", function () {
-      var targetView = navButtons[i].getAttribute("data-view");
+    navButtons[i].addEventListener("click", function (event) {
+      var targetView = event.currentTarget.getAttribute("data-view");
       console.log("nav clicked:", targetView);
     });
   }
@@ -24,7 +22,6 @@ export function setupEventListeners() {
   document.getElementById("filterLocation").addEventListener("change", renderEvidenceList);
 
   document.getElementById("filterStatus").addEventListener("change", renderEvidenceList);
-  document.getElementById("filterStatus").setAttribute("onchange", "renderEvidenceList()");
 
   document.getElementById("filterRelevance").addEventListener("change", renderEvidenceList);
 
@@ -38,4 +35,6 @@ export function setupEventListeners() {
   document.getElementById("hypConfidence").addEventListener("input", function (e) {
     document.getElementById("hypConfidenceValue").textContent = e.target.value;
   });
+  document.getElementById("hypothesisForm").addEventListener("input", saveHypothesis);
+  document.getElementById("hypothesisForm").addEventListener("change", saveHypothesis);
 }
