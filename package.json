@@ -1,0 +1,35 @@
+{
+  "name": "mystery-road-awe-2026",
+  "version": "1.0.0",
+  "description": "Investigate the failure of an AI-assisted rehabilitation robot.",
+  "main": "app.js",
+  "private": true,
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anastasiiakkorkina/mob_dev_2s.git"
+  },
+  "keywords": [
+    "investigation",
+    "vanilla-javascript",
+    "vite"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/anastasiiakkorkina/mob_dev_2s/issues"
+  },
+  "homepage": "https://github.com/anastasiiakkorkina/mob_dev_2s#readme",
+  "devDependencies": {
+    "vite": "^8.3.0"
+  }
+}
