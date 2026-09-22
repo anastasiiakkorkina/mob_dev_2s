@@ -107,15 +107,33 @@ route and unsaved text in its form stayed on screen.
 
 **Tasks**
 
-- [ ] Run the production build (`vite build`) and inspect the generated `dist/` folder.
-- [ ] Serve that build locally with `vite preview` (not the dev server) and confirm the app still works end-to-end from the built output.
-- [ ] Compare the dev-mode source with the built output for at least one file: note what changed (filenames, size, formatting/minification).
+- [x] Run the production build (`vite build`) and inspect the generated `dist/` folder.
+- [x] Serve that build locally with `vite preview` (not the dev server) and confirm the app still works end-to-end from the built output.
+- [x] Compare the dev-mode source with the built output for at least one file: note what changed (filenames, size, formatting/minification).
+
+**Demo 3 verification:** I ran `npm run build` and inspected `dist/`. The first
+preview check showed that runtime JSON files were missing from the build, so I
+added `public/data/` and `public/assets/` copies. After rebuilding, `vite preview`
+served the complete app at `http://127.0.0.1:4173/`. Dashboard loaded 18 evidence
+items, 6 people, and 6 locations; Evidence, People & Locations, Timeline, and
+Workspace also worked from the production output.
+
+**Source vs build comparison:** The source uses `styles.css` (14,534 bytes) and
+separate files in `modules/`. The build produced `dist/assets/index-xJD9k7pJ.css`
+(11,442 bytes) and `dist/assets/index-ivDJeK-9.js` (26,024 bytes). Vite bundled
+the modules, created hashed filenames, and produced a browser-ready asset layout.
 
 **Questions** (depend on the tasks above)
 
-- [ ] Name at least three concrete transformations Vite applied to your source when building for production (e.g. bundling, minification, hashed filenames. Pick the ones you actually observed).
-- [ ] Why do production filenames typically include a content hash? What problem does that solve for real deployments?
-- [ ] Why would you never want to deploy the dev server itself (`vite dev`/`vite`) to real users, even though it "works"?
+- [x] Name at least three concrete transformations Vite applied to your source when building for production (e.g. bundling, minification, hashed filenames. Pick the ones you actually observed).
+- [x] Why do production filenames typically include a content hash? What problem does that solve for real deployments?
+- [x] Why would you never want to deploy the dev server itself (`vite dev`/`vite`) to real users, even though it "works"?
+
+**Answers (simple English):**
+
+- Vite bundled the ES modules into one JavaScript asset, processed and reduced the CSS, and added content-hashed filenames such as `index-ivDJeK-9.js` and `index-xJD9k7pJ.css`.
+- A content hash changes when the file content changes. This prevents browsers from using an old cached file after a new deployment.
+- The dev server is made for development, not production. It is not optimized for many real users, may expose development details, and does not provide the final optimized build. Users should receive the files from `dist/`.
 
 ---
 
