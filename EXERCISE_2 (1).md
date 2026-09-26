@@ -446,40 +446,41 @@ and [checkout documentation](https://github.com/actions/checkout/tree/v6).
 
 **Answers (simple English):**
 
-1. If the build fails, the previously deployed site stays live. Our `deploy`
-   job has `needs: build`, so GitHub skips it when the `build` job fails.
-   The failed version is not published. This is the behavior I want:
-   visitors keep using the last working version while I fix the error.
-   In this demo, assigning `123` to the string field `currentPage` caused
-   TypeScript error TS2322. The `tsc --noEmit` part of `npm run build`
-   stopped the command before Vite or deployment could run. I checked the
-   published site in Chrome after the failure: the previous version was
-   still available.
+1. If the build job fails, the `deploy` job is skipped because it declares
+   `needs: build`. No new artifact is published by that run, so a previously
+   deployed version is expected to remain live. That is the desired
+   fail-safe behavior: visitors keep the last successful deployment while
+   the broken commit is fixed. The pushed Demo 10 commit (`c4dcf0c`) adds
+   `const intentionalTypeError: string = 123;` in `app.ts`. Locally,
+   `npm run lint` and `npm run format:check` pass, while
+   `npm run build -- --base=/mob_dev_2s/` fails in `tsc --noEmit` with
+   TS2322, before Vite, artifact upload, or deploy. The commit was pushed to
+   `demo9-deployment-workflow`; inspect its Actions run and the live site to
+   confirm the remote run status and that the prior deployment remains live.
 
-2. Permissions are configured in `.github/workflows/deployment.yml`.
-   The `build` job has `contents: read` to check out the code and
-   `pages: read` to read Pages settings. The `deploy` job has
-   `pages: write` to publish and `id-token: write` to request an OIDC
-   identity token that GitHub Pages uses to verify the deployment.
-   GitHub provides `GITHUB_TOKEN` automatically; I did not create or store
-   a personal access token or a custom deployment secret for this workflow.
-   In repository **Settings → Pages**, the source is **GitHub Actions**.
-   In **Settings → Environments → github-pages**, the deployment branch
-   `demo9-deployment-workflow` is allowed (the existing `main` rule is
-   also present). Giving unnecessary write permissions would let a
-   compromised action or malicious workflow do more damage, such as
-   changing repository content or publishing an unwanted site.
+2. The workflow's `build` job has `contents: read` for checkout and
+   `pages: read`; its `deploy` job has `pages: write` to publish and
+   `id-token: write` for the OIDC token used by GitHub Pages deployment.
+   These job-level permissions are in `.github/workflows/deployment.yml`.
+   The workflow uses GitHub's automatically provided `GITHUB_TOKEN`; no
+   personal access token or custom secret is declared in the workflow.
+   The repository also needs Pages configured to use **GitHub Actions** as
+   its build/deployment source, and the `github-pages` environment controls
+   permitted deployment branches. Confirm those repository settings under
+   **Settings → Pages** and **Settings → Environments → github-pages**.
+   Over-granting permissions increases what a compromised workflow or action
+   can do, such as modifying repository contents or publishing unwanted
+   changes. Keep permissions at the minimum needed for each job.
 
-3. `push` runs a workflow when commits are pushed to matching branches.
-   `pull_request` runs checks when a pull request is opened or updated.
-   `workflow_dispatch` allows a manual run from GitHub's interface or API;
-   the workflow must be present on the default branch for this trigger.
-   Our development workflow uses `push` and `pull_request` to check
-   branch changes and proposed merges. Our deployment workflow uses
-   `push` only for `demo9-deployment-workflow`, the dedicated publishing
-   branch chosen in Demo 9. Neither workflow currently uses
-   `workflow_dispatch`. This pairing gives broad feedback while only
-   changes pushed to the publishing branch update the live site.
+3. `push` runs when commits are pushed to matching branches. `pull_request`
+   runs checks for proposed changes when a pull request is opened or updated.
+   `workflow_dispatch` enables a manual run from GitHub's UI or API. The
+   development workflow uses `push` and `pull_request` so branch commits and
+   proposed merges receive fast checks. The deployment workflow uses `push`
+   restricted to `demo9-deployment-workflow`, so only updates to the chosen
+   publishing branch deploy automatically. Neither workflow currently uses
+   `workflow_dispatch`; manual runs would be useful for a deliberate rerun,
+   but are not needed for this push-driven setup.
 
 ---
 
