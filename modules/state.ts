@@ -84,7 +84,7 @@ export const state: AppState = {
   filteredEvidence: [],
   selectedEvidence: null,
   bookmarks: [],
-  currentPage: "dashboard",
+  currentPage: 123,
   allPeople: [],
   allLocations: [],
   allTimeline: [],
