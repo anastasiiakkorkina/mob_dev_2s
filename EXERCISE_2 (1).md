@@ -397,6 +397,37 @@ and [checkout documentation](https://github.com/actions/checkout/tree/v6).
 - [ ] What is the actual mechanism your deploy workflow uses to publish to GitHub Pages (e.g. a dedicated deploy action publishing an artifact, pushing to a `gh-pages` branch, or something else)? Explain, concretely, what it does.
 - [ ] What would you need to change in this workflow if you were deploying to a different static host instead (e.g. Netlify, Vercel, a plain server over SFTP)? What would stay the same?
 
+**Answers (simple English):**
+
+1. The deployment workflow checks the exact commit that it will publish in a
+   clean environment. Local tools or dependencies may be different, and someone
+   may forget to run checks. A green Demo 8 run could also belong to another
+   commit. Reusing its output is possible, but we would need to verify the
+   commit and pass the correct build artifact between workflows. For this
+   small project, running `npm ci`, lint, format-check, and build again is
+   simpler and gives a clear record of what was deployed.
+
+2. In `.github/workflows/deployment.yml`, the `build` job checks out the code,
+   installs dependencies, runs checks, and uses `npm run build` to run
+   TypeScript checking and Vite. The build uses `--base=/mob_dev_2s/` because
+   the site is served under that repository path. `actions/configure-pages`
+   prepares Pages metadata, and `actions/upload-pages-artifact` uploads
+   `dist/` as the `github-pages` artifact. The `deploy` job has
+   `needs: build`, so it starts only after a successful build.
+   `actions/deploy-pages` publishes that artifact using `pages: write`
+   and `id-token: write` permissions. No `gh-pages` branch is created.
+   A push to `demo9-deployment-workflow` triggers deployment automatically.
+   I chose this dedicated course-demo branch to keep the exercise separate
+   from `main`; it is explicitly allowed in the Pages environment.
+
+3. For another static host, I would replace the Pages configuration, artifact
+   publishing, and deployment steps with that host's action, CLI command, or
+   SFTP upload. I would configure its destination and any required credentials
+   as GitHub secrets, remove the Pages-specific permissions, and adjust Vite's
+   base path if the site URL changed. Checkout, Node.js setup, npm caching,
+   `npm ci`, lint, format-check, and building `dist/` would stay. Deployment
+   would still happen only after the checks and build succeeded.
+
 ---
 
 ## Demo 10 — Workflow triggers, permissions & failure modes
