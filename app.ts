@@ -32,7 +32,8 @@ async function initApp() {
   handleHashChange();
 
   const firstNote = await loadNoteAsync("E01");
-  console.log("First note preview:", firstNote);
+  const intentionalTypeError: string = 123;
+  console.log("First note preview:", firstNote, intentionalTypeError);
 }
 
 window.addEventListener("DOMContentLoaded", initApp);
