@@ -1,15 +1,16 @@
-import { renderDashboard } from "./dashboard.js";
-import { renderEvidenceList } from "./evidence_list.js";
-import { renderLocations, renderPeople } from "./people_locations.js";
+import { requireElement } from "./dom";
+import { renderDashboard } from "./dashboard";
+import { renderEvidenceList } from "./evidence_list";
+import { renderLocations, renderPeople } from "./people_locations";
 import { state } from "./state";
-import { renderTimeline } from "./timeline.js";
-import { renderWorkspace } from "./workspace.js";
+import { renderTimeline } from "./timeline";
+import { renderWorkspace } from "./workspace";
 
 // ---------------------------------------------------------------------
 // NAVIGATION / HASH ROUTING
 // ---------------------------------------------------------------------
 
-export function navigateTo(viewName) {
+export function navigateTo(viewName: string) {
   window.location.hash = viewName;
   // handleHashChange() will pick this up via the hashchange listener
 }
@@ -27,7 +28,7 @@ export function handleHashChange() {
   for (let i = 0; i < sections.length; i++) {
     sections[i].classList.remove("active");
   }
-  document.getElementById("view-" + hash).classList.add("active");
+  requireElement("view-" + hash, HTMLElement).classList.add("active");
 
   const navButtons = document.querySelectorAll(".nav-btn");
   for (let n = 0; n < navButtons.length; n++) {

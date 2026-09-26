@@ -33,7 +33,7 @@ export interface LocationRecord {
 
 export interface TimelineEvent {
   id: string;
-  timestamp: string;
+  time: string;
   title: string;
   description: string;
   type: string;

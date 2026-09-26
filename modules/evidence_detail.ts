@@ -1,18 +1,19 @@
-import { renderEvidenceList } from "./evidence_list.js";
+import { requireElement } from "./dom";
+import { renderEvidenceList } from "./evidence_list";
 import { findEvidenceById, findLocationById, findPersonById, formatDate } from "./lookup_helpers";
 import { loadNoteForEvidence, saveNoteForEvidence } from "./notes_storage";
-import { state } from "./state";
+import { type EvidenceRecord, state } from "./state";
 
 // ---------------------------------------------------------------------
 // EVIDENCE DETAIL
 // ---------------------------------------------------------------------
 
-export function openEvidenceDetail(evidenceId) {
+export function openEvidenceDetail(evidenceId: string) {
   const ev = findEvidenceById(evidenceId);
   if (!ev) return;
   state.selectedEvidence = ev;
 
-  const section = document.getElementById("evidenceDetailSection");
+  const section = requireElement("evidenceDetailSection", HTMLElement);
   section.classList.remove("hidden");
 
   renderEvidenceDetail(ev);
@@ -20,14 +21,14 @@ export function openEvidenceDetail(evidenceId) {
 }
 
 export function closeEvidenceDetail() {
-  const section = document.getElementById("evidenceDetailSection");
+  const section = requireElement("evidenceDetailSection", HTMLElement);
   section.classList.add("hidden");
   section.innerHTML = "";
   state.selectedEvidence = null;
 }
 
-function renderEvidenceDetail(ev) {
-  const section = document.getElementById("evidenceDetailSection");
+function renderEvidenceDetail(ev: EvidenceRecord) {
+  const section = requireElement("evidenceDetailSection", HTMLElement);
 
   const personNames = [];
   for (let p = 0; p < ev.personIds.length; p++) {
@@ -104,29 +105,35 @@ function renderEvidenceDetail(ev) {
     '<div class="detail-field"><strong>Note preview</strong><div id="notePreview"></div></div>';
 
   section.innerHTML = html;
-  document.getElementById("evidenceNoteInput").value = storedNote;
-  document.getElementById("notePreview").textContent = storedNote;
+  requireElement("evidenceNoteInput", HTMLTextAreaElement).value = storedNote;
+  requireElement("notePreview", HTMLElement).textContent = storedNote;
 
-  document.getElementById("detailStatusSelect").addEventListener("change", function (e) {
+  requireElement("detailStatusSelect", HTMLSelectElement).addEventListener("change", function (e) {
+    if (!(e.target instanceof HTMLSelectElement)) return;
     ev.status = e.target.value; // direct mutation of the loaded evidence object
     if (state.viewRendered.evidence) renderEvidenceList();
   });
-  document.getElementById("detailRelevanceSelect").addEventListener("change", function (e) {
-    ev.relevance = e.target.value;
-    if (state.viewRendered.evidence) renderEvidenceList();
-  });
+  requireElement("detailRelevanceSelect", HTMLSelectElement).addEventListener(
+    "change",
+    function (e) {
+      if (!(e.target instanceof HTMLSelectElement)) return;
+      ev.relevance = e.target.value;
+      if (state.viewRendered.evidence) renderEvidenceList();
+    },
+  );
 }
 
-function statusOptionHTML(current, value, label) {
+function statusOptionHTML(current: string, value: string, label: string) {
   const currentLower = (current || "").toLowerCase();
   const selected = currentLower === value ? " selected" : "";
   return '<option value="' + value + '"' + selected + ">" + label + "</option>";
 }
 
 export function saveCurrentNote() {
-  const textarea = document.getElementById("evidenceNoteInput");
+  const textarea = requireElement("evidenceNoteInput", HTMLTextAreaElement);
   if (!textarea) return;
   const evidenceId = textarea.getAttribute("data-evidence-id"); // note id is read back off the DOM
+  if (!evidenceId) return;
   const text = textarea.value;
   saveNoteForEvidence(evidenceId, text);
   const preview = document.getElementById("notePreview");

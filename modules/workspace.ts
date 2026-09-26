@@ -1,5 +1,6 @@
-import { openEvidenceDetail } from "./evidence_detail.js";
-import { navigateTo } from "./navigation.js";
+import { requireElement } from "./dom";
+import { openEvidenceDetail } from "./evidence_detail";
+import { navigateTo } from "./navigation";
 import { STORAGE_KEY_HYPOTHESIS, state } from "./state";
 
 // ---------------------------------------------------------------------
@@ -43,9 +44,10 @@ function renderBookmarksList() {
 
   const openButtons = container.querySelectorAll("[data-open-evidence]");
   for (let b = 0; b < openButtons.length; b++) {
-    openButtons[b].addEventListener("click", function (e) {
+    openButtons[b].addEventListener("click", function () {
       navigateTo("evidence");
-      const id = e.target.getAttribute("data-open-evidence");
+      const id = openButtons[b].getAttribute("data-open-evidence");
+      if (!id) return;
       setTimeout(function () {
         openEvidenceDetail(id);
       }, 0);
@@ -89,13 +91,14 @@ function renderNotesList() {
   // Populate the note text content after the container is in the DOM. DOM elements must exist before setting textContent,
   // otherwise it will fail silently. This is why we don't do it in the loop above.
   for (let n = 0; n < noteEntries.length; n++) {
-    document.getElementById("noteText-" + noteEntries[n].index).textContent = noteEntries[n].text;
+    requireElement("noteText-" + noteEntries[n].index, HTMLElement).textContent =
+      noteEntries[n].text;
   }
 }
 
 export function populateHypothesisDropdowns() {
-  const suspectSelect = document.getElementById("hypSuspect");
-  const evidenceSelect = document.getElementById("hypEvidence");
+  const suspectSelect = requireElement("hypSuspect", HTMLSelectElement);
+  const evidenceSelect = requireElement("hypEvidence", HTMLSelectElement);
   if (!suspectSelect || !evidenceSelect) return;
 
   const currentSuspect = suspectSelect.value;
@@ -119,16 +122,16 @@ export function populateHypothesisDropdowns() {
   }
 }
 
-let savedMessageTimer;
+let savedMessageTimer: ReturnType<typeof setTimeout> | undefined;
 
 export function saveHypothesis() {
   const draft = {
-    suspectId: document.getElementById("hypSuspect").value,
-    nature: document.getElementById("hypNature").value,
-    evidenceIds: getSelectedOptions(document.getElementById("hypEvidence")),
-    confidence: document.getElementById("hypConfidence").value,
-    explanation: document.getElementById("hypExplanation").value,
-    alternative: document.getElementById("hypAlternative").value,
+    suspectId: requireElement("hypSuspect", HTMLSelectElement).value,
+    nature: requireElement("hypNature", HTMLSelectElement).value,
+    evidenceIds: getSelectedOptions(requireElement("hypEvidence", HTMLSelectElement)),
+    confidence: requireElement("hypConfidence", HTMLInputElement).value,
+    explanation: requireElement("hypExplanation", HTMLTextAreaElement).value,
+    alternative: requireElement("hypAlternative", HTMLTextAreaElement).value,
     savedAt: new Date().toISOString(),
   };
 
@@ -140,7 +143,7 @@ export function saveHypothesis() {
     return;
   }
 
-  const msg = document.getElementById("hypothesisSavedMsg");
+  const msg = requireElement("hypothesisSavedMsg", HTMLElement);
   msg.classList.remove("hidden");
   clearTimeout(savedMessageTimer);
   savedMessageTimer = setTimeout(function () {
@@ -148,7 +151,7 @@ export function saveHypothesis() {
   }, 2000);
 }
 
-function getSelectedOptions(selectEl) {
+function getSelectedOptions(selectEl: HTMLSelectElement) {
   const result = [];
   for (let i = 0; i < selectEl.options.length; i++) {
     if (selectEl.options[i].selected) result.push(selectEl.options[i].value);
@@ -157,29 +160,39 @@ function getSelectedOptions(selectEl) {
 }
 
 function loadHypothesisFromStorage() {
-  let draft = {};
+  let draft: Record<string, unknown> = {};
   try {
     const raw = localStorage.getItem(STORAGE_KEY_HYPOTHESIS);
-    const parsed = raw ? JSON.parse(raw) : {};
-    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) draft = parsed;
+    const parsed: unknown = raw ? JSON.parse(raw) : {};
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed))
+      draft = parsed as Record<string, unknown>;
   } catch (err) {
     console.warn("Could not read stored hypothesis, starting empty", err);
   }
 
-  document.getElementById("hypSuspect").value = draft.suspectId || "";
-  document.getElementById("hypNature").value = draft.nature || "";
+  requireElement("hypSuspect", HTMLSelectElement).value =
+    typeof draft.suspectId === "string" ? draft.suspectId : "";
+  requireElement("hypNature", HTMLSelectElement).value =
+    typeof draft.nature === "string" ? draft.nature : "";
   let confidence = draft.confidence;
   if (typeof confidence === "string" && confidence.trim() !== "") confidence = Number(confidence);
-  if (typeof confidence !== "number" || !Number.isFinite(confidence)) confidence = 50;
-  confidence = Math.round(Math.max(0, Math.min(100, confidence)));
-  document.getElementById("hypConfidence").value = confidence;
-  document.getElementById("hypConfidenceValue").textContent = confidence;
-  document.getElementById("hypExplanation").value =
+  const normalizedConfidence = Math.round(
+    Math.max(
+      0,
+      Math.min(
+        100,
+        typeof confidence === "number" && Number.isFinite(confidence) ? confidence : 50,
+      ),
+    ),
+  );
+  requireElement("hypConfidence", HTMLInputElement).value = String(normalizedConfidence);
+  requireElement("hypConfidenceValue", HTMLElement).textContent = String(normalizedConfidence);
+  requireElement("hypExplanation", HTMLTextAreaElement).value =
     typeof draft.explanation === "string" ? draft.explanation : "";
-  document.getElementById("hypAlternative").value =
+  requireElement("hypAlternative", HTMLTextAreaElement).value =
     typeof draft.alternative === "string" ? draft.alternative : "";
 
-  const evidenceSelect = document.getElementById("hypEvidence");
+  const evidenceSelect = requireElement("hypEvidence", HTMLSelectElement);
   const savedIds = Array.isArray(draft.evidenceIds) ? draft.evidenceIds : [];
   for (let i = 0; i < evidenceSelect.options.length; i++) {
     evidenceSelect.options[i].selected = savedIds.indexOf(evidenceSelect.options[i].value) !== -1;

@@ -1,4 +1,5 @@
-import { openEvidenceDetail } from "./evidence_detail.js";
+import { requireElement } from "./dom";
+import { openEvidenceDetail } from "./evidence_detail";
 import {
   evidenceMentionsPerson,
   findEvidenceById,
@@ -8,16 +9,16 @@ import {
   getStatusBadgeClass,
 } from "./lookup_helpers";
 import { saveBookmarksToStorage } from "./notes_storage";
-import { state } from "./state";
+import { type EvidenceRecord, state } from "./state";
 
 // ---------------------------------------------------------------------
 // EVIDENCE CATALOGUE
 // ---------------------------------------------------------------------
 
 export function populateEvidenceDropdowns() {
-  const typeSelect = document.getElementById("filterType");
-  const personSelect = document.getElementById("filterPerson");
-  const locationSelect = document.getElementById("filterLocation");
+  const typeSelect = requireElement("filterType", HTMLSelectElement);
+  const personSelect = requireElement("filterPerson", HTMLSelectElement);
+  const locationSelect = requireElement("filterLocation", HTMLSelectElement);
   if (!typeSelect || !personSelect || !locationSelect) return;
 
   const types = [];
@@ -50,13 +51,13 @@ export function populateEvidenceDropdowns() {
 }
 
 function getFilteredEvidence() {
-  const searchBox = document.getElementById("evidenceSearch");
+  const searchBox = requireElement("evidenceSearch", HTMLInputElement);
   const searchTerm = searchBox ? searchBox.value.toLowerCase().trim() : "";
-  const typeVal = document.getElementById("filterType").value;
-  const personVal = document.getElementById("filterPerson").value;
-  const locationVal = document.getElementById("filterLocation").value;
-  const statusVal = document.getElementById("filterStatus").value;
-  const relevanceVal = document.getElementById("filterRelevance").value;
+  const typeVal = requireElement("filterType", HTMLSelectElement).value;
+  const personVal = requireElement("filterPerson", HTMLSelectElement).value;
+  const locationVal = requireElement("filterLocation", HTMLSelectElement).value;
+  const statusVal = requireElement("filterStatus", HTMLSelectElement).value;
+  const relevanceVal = requireElement("filterRelevance", HTMLSelectElement).value;
 
   const results = [];
   for (let i = 0; i < state.allEvidence.length; i++) {
@@ -72,7 +73,8 @@ function getFilteredEvidence() {
       const person = findPersonById(personVal);
       if (!person || !evidenceMentionsPerson(item, person)) matches = false;
     }
-    if (matches && locationVal && item.locationIds.indexOf(locationVal) === -1) matches = false;
+    if (matches && locationVal && !item.locationIds.some((id) => id === locationVal))
+      matches = false;
     if (matches && statusVal && (item.status || "").toLowerCase() !== statusVal) matches = false;
     if (matches && relevanceVal && (item.relevance || "").toLowerCase() !== relevanceVal)
       matches = false;
@@ -118,7 +120,7 @@ export function renderEvidenceList() {
   }
 }
 
-function renderEvidenceCardHTML(ev) {
+function renderEvidenceCardHTML(ev: EvidenceRecord) {
   const isBookmarked = state.bookmarks.indexOf(ev.id) !== -1;
   let html = '<div class="evidence-card" data-id="' + ev.id + '">';
   html +=
@@ -157,22 +159,25 @@ function renderEvidenceCardHTML(ev) {
   return html;
 }
 
-function handleEvidenceListClick(event) {
+function handleEvidenceListClick(event: MouseEvent) {
   const target = event.target;
+  if (!(target instanceof HTMLElement)) return;
 
   if (target.dataset && target.dataset.action === "bookmark") {
     event.stopPropagation();
-    handleBookmarkClick(target.dataset.id);
+    const id = target.dataset.id;
+    if (id) handleBookmarkClick(id);
     return;
   }
 
   const card = target.closest(".evidence-card");
   if (card) {
-    openEvidenceDetail(card.getAttribute("data-id"));
+    const id = card.getAttribute("data-id");
+    if (id) openEvidenceDetail(id);
   }
 }
 
-function handleBookmarkClick(evidenceId) {
+function handleBookmarkClick(evidenceId: string) {
   const ev = findEvidenceById(evidenceId);
   if (!ev) return;
 
@@ -205,8 +210,8 @@ export function handleSortChange() {
 }
 
 // Sort only the new array returned by getFilteredEvidence, never the source.
-function sortEvidence(results) {
-  const sortValue = document.getElementById("sortEvidence").value;
+function sortEvidence(results: EvidenceRecord[]) {
+  const sortValue = requireElement("sortEvidence", HTMLSelectElement).value;
 
   if (sortValue === "title-asc") {
     results.sort(function (a, b) {
@@ -218,26 +223,26 @@ function sortEvidence(results) {
     });
   } else if (sortValue === "date-asc") {
     results.sort(function (a, b) {
-      return new Date(a.timestamp) - new Date(b.timestamp);
+      return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
     });
   } else {
     results.sort(function (a, b) {
-      return new Date(b.timestamp) - new Date(a.timestamp);
+      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
     });
   }
 }
 
 export function clearFilters() {
-  document.getElementById("evidenceSearch").value = "";
-  document.getElementById("filterType").value = "";
-  document.getElementById("filterPerson").value = "";
-  document.getElementById("filterLocation").value = "";
-  document.getElementById("filterStatus").value = "";
-  document.getElementById("filterRelevance").value = "";
+  requireElement("evidenceSearch", HTMLInputElement).value = "";
+  requireElement("filterType", HTMLSelectElement).value = "";
+  requireElement("filterPerson", HTMLSelectElement).value = "";
+  requireElement("filterLocation", HTMLSelectElement).value = "";
+  requireElement("filterStatus", HTMLSelectElement).value = "";
+  requireElement("filterRelevance", HTMLSelectElement).value = "";
   renderEvidenceList();
 }
 
-const simulateAsyncSearch = (term) =>
+const simulateAsyncSearch = (term: string): Promise<string> =>
   new Promise((resolve) => {
     setTimeout(() => {
       resolve(term);
@@ -246,7 +251,8 @@ const simulateAsyncSearch = (term) =>
 
 let latestSearchRequestId = 0;
 
-export function handleSearchInput(event) {
+export function handleSearchInput(event: Event) {
+  if (!(event.target instanceof HTMLInputElement)) return;
   const term = event.target.value;
   const requestId = ++latestSearchRequestId;
 

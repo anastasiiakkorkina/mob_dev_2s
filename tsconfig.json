@@ -5,15 +5,9 @@
     "moduleResolution": "Bundler",
     "lib": ["ES2022", "DOM"],
     "strict": true,
-    "allowJs": true,
-    "checkJs": false,
+    "allowJs": false,
     "noEmit": true,
     "skipLibCheck": true
   },
-  "include": [
-    "modules/state.ts",
-    "modules/lookup_helpers.ts",
-    "modules/notes_storage.ts",
-    "modules/data_loading.ts"
-  ]
+  "include": ["app.ts", "modules/**/*.ts"]
 }

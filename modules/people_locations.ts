@@ -1,18 +1,19 @@
-import { clearFilters, renderEvidenceList } from "./evidence_list.js";
+import { requireElement } from "./dom";
+import { clearFilters, renderEvidenceList } from "./evidence_list";
 import { evidenceMentionsPerson } from "./lookup_helpers";
-import { navigateTo } from "./navigation.js";
-import { state } from "./state";
+import { navigateTo } from "./navigation";
+import { type PersonRecord, state } from "./state";
 
 // ---------------------------------------------------------------------
 // PEOPLE & LOCATIONS
 // ---------------------------------------------------------------------
 
-export function switchPeopleTab(tab) {
+export function switchPeopleTab(tab: "people" | "locations") {
   state.currentPeopleTab = tab;
-  const peoplePanel = document.getElementById("peoplePanel");
-  const locationsPanel = document.getElementById("locationsPanel");
-  const peopleTabBtn = document.getElementById("tabPeopleBtn");
-  const locationsTabBtn = document.getElementById("tabLocationsBtn");
+  const peoplePanel = requireElement("peoplePanel", HTMLElement);
+  const locationsPanel = requireElement("locationsPanel", HTMLElement);
+  const peopleTabBtn = requireElement("tabPeopleBtn", HTMLElement);
+  const locationsTabBtn = requireElement("tabLocationsBtn", HTMLElement);
 
   if (tab === "people") {
     peoplePanel.classList.remove("hidden");
@@ -27,7 +28,7 @@ export function switchPeopleTab(tab) {
   }
 }
 
-function countEvidenceForPerson(person) {
+function countEvidenceForPerson(person: PersonRecord) {
   let count = 0;
   for (let i = 0; i < state.allEvidence.length; i++) {
     if (evidenceMentionsPerson(state.allEvidence[i], person)) count++;
@@ -36,7 +37,7 @@ function countEvidenceForPerson(person) {
 }
 
 export function renderPeople() {
-  const container = document.getElementById("peoplePanel");
+  const container = requireElement("peoplePanel", HTMLElement);
   let html = "";
   for (let i = 0; i < state.allPeople.length; i++) {
     const person = state.allPeople[i];
@@ -71,10 +72,11 @@ export function renderPeople() {
 
   const links = container.querySelectorAll(".evidence-count-link");
   for (let l = 0; l < links.length; l++) {
-    links[l].addEventListener("click", function (e) {
-      const personId = e.target.getAttribute("data-person-id");
+    links[l].addEventListener("click", function () {
+      const personId = links[l].getAttribute("data-person-id");
+      if (!personId) return;
       clearFilters();
-      document.getElementById("filterPerson").value = personId;
+      requireElement("filterPerson", HTMLSelectElement).value = personId;
       navigateTo("evidence");
       setTimeout(function () {
         renderEvidenceList();
@@ -84,7 +86,7 @@ export function renderPeople() {
 }
 
 export function renderLocations() {
-  const container = document.getElementById("locationsPanel");
+  const container = requireElement("locationsPanel", HTMLElement);
   let html = "";
   for (let i = 0; i < state.allLocations.length; i++) {
     const loc = state.allLocations[i];

@@ -41,7 +41,7 @@ or answer on the spot, live.**
 | 4 | `package.json` scripts: lint & format | ☐ |
 | 5 | TypeScript setup & first conversions | ☐ |
 | 6 | Typing the domain data | ☐ |
-| 7 | Full migration & resolving type errors | ☐ |
+| 7 | Full migration & resolving type errors | ☑ |
 | 8 | GitHub Actions: development workflow | ☐ |
 | 9 | GitHub Actions: deployment workflow | ☐ |
 | 10 | Workflow triggers, permissions & failure modes | ☐ |
@@ -233,15 +233,76 @@ had to check both forms. I normalized the JSON data to use `"nova-byte"` and mad
 
 **Tasks**
 
-- [ ] Convert the remaining `.js` modules to `.ts`, and get the **entire app** compiling with zero TypeScript errors under the strictness settings from Demo 5.
-- [ ] Find at least 3 real spots where the compiler flagged something you had to actually think about (a union type, a possibly-`undefined` value, an implicit `any`, etc.). For each, decide and record whether it pointed at a real latent bug or was "just" the compiler being pedantic.
-- [ ] Confirm the app still behaves identically to the working JavaScript version — a type-safe app that behaves differently is not a successful migration.
+- [x] Convert the remaining `.js` modules to `.ts`, and get the **entire app** compiling with zero TypeScript errors under the strictness settings from Demo 5.
+- [x] Find at least 3 real spots where the compiler flagged something you had to actually think about (a union type, a possibly-`undefined` value, an implicit `any`, etc.). For each, decide and record whether it pointed at a real latent bug or was "just" the compiler being pedantic.
+- [x] Confirm the app still behaves identically to the working JavaScript version — a type-safe app that behaves differently is not a successful migration.
 
 **Questions** (depend on the tasks above)
 
-- [ ] Show one specific type error you had to actually think about (not just silence with `any` or the `!` non-null assertion). What did it tell you about your code that plain JS review or testing hadn't?
-- [ ] When (if ever) is reaching for `any` the right call during a migration like this, versus a sign you should model the type properly? Where did you draw that line?
-- [ ] Did the migration reveal anything that was a genuine, previously-unnoticed bug (as opposed to just noise)? If yes, explain it. If no, explain how you're confident it was only noise.
+- [x] Show one specific type error you had to actually think about (not just silence with `any` or the `!` non-null assertion). What did it tell you about your code that plain JS review or testing hadn't?
+- [x] When (if ever) is reaching for `any` the right call during a migration like this, versus a sign you should model the type properly? Where did you draw that line?
+- [x] Did the migration reveal anything that was a genuine, previously-unnoticed bug (as opposed to just noise)? If yes, explain it. If no, explain how you're confident it was only noise.
+
+**Demo 7 verification:** All application modules now use TypeScript. The files
+had already been renamed, but most still needed types. I included `app.ts` and
+`modules/**/*.ts` in `tsconfig.json`, kept Demo 5's `strict: true`, and disabled
+`allowJs`. I updated the HTML entry point and lint/format scripts. The whole app
+passes `npm run build` with zero TypeScript errors, without adding `any` or
+non-null assertions. ESLint passes with zero errors and nine console warnings.
+
+**Compiler findings and decisions:**
+
+| Place | Compiler problem | Decision and fix |
+|---|---|---|
+| Stored hypothesis in `workspace.ts` | Properties such as `suspectId` did not exist on the inferred type `{}`. | Investigating this exposed a **real validation bug**. I read JSON as `unknown`, check that it is an object, and check field types before using them. |
+| Timeline model in `state.ts` | `time` did not exist on `TimelineEvent`. | **Incorrect type model, not a JavaScript runtime bug.** JSON and the working UI use `time`, so I changed the interface from `timestamp` to `time`. |
+| Date sorting | TypeScript rejected subtraction of two `Date` objects. | **Compiler strictness, not a runtime bug.** JavaScript already converts dates to numbers here. Explicit `.getTime()` preserves the same sorting. |
+| DOM elements and events | An element could be `null`; `value` does not exist on every `HTMLElement` or `EventTarget`. | **Unchecked assumptions, not demonstrated failures with the current HTML.** I check element classes with `instanceof`. The shared `requireElement` helper checks required elements instead of using `!`. |
+
+**Behavior comparison:** I ran the same Chrome scenarios against the original
+JavaScript UI from Git revision `b3b1155` and the migrated app, including its
+production build. All five views, evidence filters, search, four sorting modes,
+details, notes, bookmark buttons, people/location tabs, timeline filters and modal,
+navigation, and saved hypothesis values matched. Notes and hypothesis values
+also survived reload. No uncaught page errors occurred in these scenarios.
+A failed evidence request still displayed the error message.
+
+These checks cover the tested workflows, not every possible interaction.
+The existing inner bookmark-star click issue remains: clicking the icon can open
+the card instead of toggling the bookmark. The comparison checked the button
+itself. Malformed storage is the intentional behavior correction explained below.
+
+**Answers (simple English):**
+
+1. **One error that required thought:** The hypothesis loader used
+   `let draft = {}`, so TypeScript reported that `draft.suspectId` did not exist.
+   Simply asserting a draft type would hide the problem. I used `unknown`,
+   checked that the parsed value was an object, and checked individual fields,
+   for example `typeof draft.suspectId === "string"`. This showed that an object
+   can exist but still contain fields of the wrong type. Normal testing only
+   created valid drafts and missed that case. The compiler did not read
+   localStorage; its error made me investigate it.
+
+2. **When to use any:** `any` can be a small, temporary escape hatch for an old
+   library without useful types, with a clear reason and a plan to remove it.
+   It should not spread through the app. Here, records, DOM elements, and
+   callbacks have meaningful types, so I modeled them properly. For uncertain
+   JSON I used `unknown` and checks. I added no `any`. The existing
+   `fetchJson<T>()` still uses an assertion: it does not validate HTTP data at
+   runtime, so that remains a limitation.
+
+3. **A real bug:** Yes. With
+   `{"suspectId":["nova-byte"],"nature":["deliberate"]}` in localStorage, the old
+   version converted these arrays to strings and selected values in the form.
+   The fields had the wrong types but looked valid to the user. I reproduced
+   this in Chrome. The new code rejects those fields and leaves the selects
+   empty. Correct saved drafts still restore as before. This fixes malformed
+   input while preserving the normal workflow.
+
+**Manuscript basis:** *Advanced Web Engineering*, Chapter 10, PDF pages 67–78:
+10.1–10.2 (type checking and erased types), 10.6–10.8 (narrowing, `unknown`,
+`any`, and nullability), 10.16 (runtime validation), and 10.17–10.19 (compiler
+settings, limits, and gradual migration).
 
 ---
 

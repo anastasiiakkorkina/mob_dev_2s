@@ -1,9 +1,9 @@
-import { renderDashboard } from "./dashboard.js";
+import { renderDashboard } from "./dashboard";
 import {
   applyStoredBookmarkFlags,
   populateEvidenceDropdowns,
   renderEvidenceList,
-} from "./evidence_list.js";
+} from "./evidence_list";
 import {
   CaseRecord,
   EvidenceRecord,
@@ -12,8 +12,8 @@ import {
   state,
   TimelineEvent,
 } from "./state";
-import { populateTimelineDropdowns, renderTimeline } from "./timeline.js";
-import { populateHypothesisDropdowns } from "./workspace.js";
+import { populateTimelineDropdowns, renderTimeline } from "./timeline";
+import { populateHypothesisDropdowns } from "./workspace";
 
 async function fetchJson<T>(path: string): Promise<T> {
   const response = await fetch(path);

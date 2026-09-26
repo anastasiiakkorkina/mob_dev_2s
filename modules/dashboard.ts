@@ -21,12 +21,12 @@ export function renderDashboard() {
 
   let html = "";
   html += '<div class="case-summary-card">';
-  html += "<h3>" + (state.caseData.title || "Case") + "</h3>";
+  html += "<h3>" + (state.caseData?.title || "Case") + "</h3>";
   html +=
     '<p><span class="badge badge-flagged">' +
-    (state.caseData.status || "unknown").toUpperCase() +
+    (state.caseData?.status || "unknown").toUpperCase() +
     "</span></p>";
-  html += "<p>" + (state.caseData.summary || "") + "</p>";
+  html += "<p>" + (state.caseData?.summary || "") + "</p>";
   html += "</div>";
 
   html += '<div class="stat-grid">';
@@ -52,7 +52,7 @@ export function renderDashboard() {
   const recentEvidence = state.allEvidence
     .slice()
     .sort(function (a, b) {
-      return new Date(b.timestamp) - new Date(a.timestamp);
+      return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
     })
     .slice(0, 5);
   if (recentEvidence.length === 0) {
@@ -94,7 +94,7 @@ export function renderDashboard() {
   container.innerHTML = html;
 }
 
-const statCardHTML = (value, label) => {
+const statCardHTML = (value: number, label: string) => {
   return (
     '<div class="stat-card"><div class="stat-value">' +
     value +

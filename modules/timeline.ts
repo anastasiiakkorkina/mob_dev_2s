@@ -1,6 +1,7 @@
-import { openEvidenceDetail } from "./evidence_detail.js";
+import { requireElement } from "./dom";
+import { openEvidenceDetail } from "./evidence_detail";
 import { findEvidenceById, findLocationById, formatDate } from "./lookup_helpers";
-import { navigateTo } from "./navigation.js";
+import { navigateTo } from "./navigation";
 import { state } from "./state";
 
 // ---------------------------------------------------------------------
@@ -8,9 +9,9 @@ import { state } from "./state";
 // ---------------------------------------------------------------------
 
 export function populateTimelineDropdowns() {
-  const personSelect = document.getElementById("timelinePersonFilter");
-  const locationSelect = document.getElementById("timelineLocationFilter");
-  const typeSelect = document.getElementById("timelineTypeFilter");
+  const personSelect = requireElement("timelinePersonFilter", HTMLSelectElement);
+  const locationSelect = requireElement("timelineLocationFilter", HTMLSelectElement);
+  const typeSelect = requireElement("timelineTypeFilter", HTMLSelectElement);
   if (!personSelect || !locationSelect || !typeSelect) return;
 
   personSelect.innerHTML = '<option value="">All people</option>';
@@ -43,22 +44,22 @@ export function renderTimeline() {
     return;
   }
 
-  const order = document.getElementById("timelineOrder").value;
-  const personFilter = document.getElementById("timelinePersonFilter").value;
-  const locationFilter = document.getElementById("timelineLocationFilter").value;
-  const typeFilter = document.getElementById("timelineTypeFilter").value;
+  const order = requireElement("timelineOrder", HTMLSelectElement).value;
+  const personFilter = requireElement("timelinePersonFilter", HTMLSelectElement).value;
+  const locationFilter = requireElement("timelineLocationFilter", HTMLSelectElement).value;
+  const typeFilter = requireElement("timelineTypeFilter", HTMLSelectElement).value;
 
   let events = [];
   for (let i = 0; i < state.allTimeline.length; i++) {
     const evt = state.allTimeline[i];
-    if (personFilter && evt.personIds.indexOf(personFilter) === -1) continue;
-    if (locationFilter && evt.locationIds.indexOf(locationFilter) === -1) continue;
+    if (personFilter && !evt.personIds.some((id) => id === personFilter)) continue;
+    if (locationFilter && !evt.locationIds.some((id) => id === locationFilter)) continue;
     if (typeFilter && evt.type !== typeFilter) continue;
     events.push(evt);
   }
 
   events = events.slice().sort(function (a, b) {
-    const diff = new Date(a.time) - new Date(b.time);
+    const diff = new Date(a.time).getTime() - new Date(b.time).getTime();
     return order === "desc" ? -diff : diff;
   });
 
@@ -103,13 +104,14 @@ export function renderTimeline() {
 
   const linkButtons = container.querySelectorAll(".evidence-link-btn");
   for (let b = 0; b < linkButtons.length; b++) {
-    linkButtons[b].addEventListener("click", function (e) {
-      openEvidenceModal(e.target.getAttribute("data-evidence-id"));
+    linkButtons[b].addEventListener("click", function () {
+      const id = linkButtons[b].getAttribute("data-evidence-id");
+      if (id) openEvidenceModal(id);
     });
   }
 }
 
-function certaintyBadgeClass(certainty) {
+function certaintyBadgeClass(certainty: string) {
   if (certainty === "confirmed") return "reviewed";
   if (certainty === "contradictory") return "critical";
   if (certainty === "reported") return "flagged";
@@ -117,7 +119,7 @@ function certaintyBadgeClass(certainty) {
 }
 
 // --- Quick-view modal (used from the timeline) -------------------------
-function openEvidenceModal(evidenceId) {
+function openEvidenceModal(evidenceId: string) {
   const ev = findEvidenceById(evidenceId);
   if (!ev) return;
 
@@ -151,7 +153,8 @@ function openEvidenceModal(evidenceId) {
     "</div></div>";
 }
 
-function handleModalClick(e) {
+function handleModalClick(e: MouseEvent) {
+  if (!(e.target instanceof Element) || !(e.currentTarget instanceof HTMLElement)) return;
   const modal = e.currentTarget;
   if (
     e.target.classList.contains("modal-close-btn") ||
