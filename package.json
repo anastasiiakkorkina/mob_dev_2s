@@ -12,9 +12,10 @@
     "build": "tsc --noEmit && vite build",
     "lint": "eslint app.ts modules",
     "lint:fix": "eslint app.ts modules --fix",
-    "format": "prettier --write app.ts modules data styles.css package.json",
+    "format": "prettier --write app.ts modules data styles.css package.json tsconfig.json eslint.config.mjs .github/workflows",
     "preview": "vite preview",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format:check": "prettier --check app.ts modules data styles.css package.json tsconfig.json eslint.config.mjs .github/workflows"
   },
   "repository": {
     "type": "git",
