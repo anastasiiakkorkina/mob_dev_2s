@@ -42,7 +42,7 @@ or answer on the spot, live.**
 | 5 | TypeScript setup & first conversions | ☐ |
 | 6 | Typing the domain data | ☐ |
 | 7 | Full migration & resolving type errors | ☑ |
-| 8 | GitHub Actions: development workflow | ☐ |
+| 8 | GitHub Actions: development workflow | ☑ |
 | 9 | GitHub Actions: deployment workflow | ☐ |
 | 10 | Workflow triggers, permissions & failure modes | ☐ |
 
@@ -310,15 +310,76 @@ settings, limits, and gradual migration).
 
 **Tasks**
 
-- [ ] Write a GitHub Actions workflow that triggers on push (and/or pull request), checks out the repo, sets up Node.js at the right version, installs dependencies (with dependency caching), and runs your `lint` and a format-check (e.g. `prettier --check`).
-- [ ] Push a commit that deliberately fails lint or format, and show the workflow **failing** in the Actions tab.
-- [ ] Fix it and push again, and show the same workflow **passing**.
+- [x] Write a GitHub Actions workflow that triggers on push (and/or pull request), checks out the repo, sets up Node.js at the right version, installs dependencies (with dependency caching), and runs your `lint` and a format-check (e.g. `prettier --check`).
+- [x] Push a commit that deliberately fails lint or format, and show the workflow **failing** in the Actions tab.
+- [x] Fix it and push again, and show the same workflow **passing**.
 
 **Questions** (depend on the tasks above)
 
-- [ ] What is the difference between a workflow, a job, and a step in GitHub Actions? Point to one of each in your workflow file.
-- [ ] Why should lint/format run in CI at all, if it already runs (or could run) on every developer's own machine before they push?
-- [ ] What is dependency caching doing in your workflow, and what would happen (both correctness- and speed-wise) if you removed it?
+- [x] What is the difference between a workflow, a job, and a step in GitHub Actions? Point to one of each in your workflow file.
+- [x] Why should lint/format run in CI at all, if it already runs (or could run) on every developer's own machine before they push?
+- [x] What is dependency caching doing in your workflow, and what would happen (both correctness- and speed-wise) if you removed it?
+
+**Demo 8 implementation:** I added
+[`.github/workflows/development.yml`](.github/workflows/development.yml).
+It runs on `push` and `pull_request`. The `quality` job uses an Ubuntu runner
+and runs these steps in order: checkout, set up Node.js 24 with npm caching,
+install dependencies with `npm ci`, run `npm run lint`, and run
+`npm run format:check`. Node.js 24 meets the requirements of this project's
+Vite and ESLint versions. The workflow only needs `contents: read`.
+
+I added `format:check` to `package.json`. It checks the same files as
+`format`, including the workflow and configuration files, but does not modify
+them. I also formatted the existing line break in `modules/dom.ts`.
+No separate test files or new dependencies were needed.
+
+**Failing run:** On branch `demo8-development-workflow`, commit `886f725`
+deliberately changed the first import in `app.ts` to single quotes. Our
+Prettier configuration requires double quotes. The code still worked, but
+the workflow failed at **Check formatting**. Checkout, Node setup, dependency
+installation, and ESLint all passed.
+[Open the failed run](https://github.com/anastasiiakkorkina/mob_dev_2s/actions/runs/36269453186).
+
+**Fix:** Commit `6a45ba7` restores double quotes using Prettier.
+The same workflow completed successfully: all steps passed.
+The workflow file itself is unchanged.
+[Open the fix run](https://github.com/anastasiiakkorkina/mob_dev_2s/actions/runs/36269489110).
+
+**Answers (simple English):**
+
+1. **Workflow, job, and step:** A workflow is the whole automated process
+   described in a YAML file. Here it is **Development checks** in
+   `development.yml`. A job is a group of steps that runs on a runner:
+   our job ID is `quality`, shown as **Lint and formatting**, and it runs
+   on `ubuntu-latest`. A step is one action or command inside the job,
+   for example **Run ESLint**, which executes `npm run lint`.
+   Steps in this job run in order.
+
+2. **Why run checks in CI?** A developer can forget to run local checks,
+   have different tools installed, or push an unchecked change. CI runs
+   the same commands in a clean environment using the committed code and
+   lockfile. Everyone can see the result for that exact commit. My deliberate
+   formatting mistake demonstrates this: GitHub detected it after the push,
+   even though the application code was still valid.
+
+3. **What does caching do?** `cache: npm` lets `setup-node` reuse npm's
+   downloaded package data between runs. `package-lock.json` helps determine
+   the cache key. This does not cache `node_modules`, and it does not replace
+   `npm ci`. The lockfile determines the dependency versions; the cache mainly
+   saves download time. Without a cache, npm downloads packages again, so the
+   run may be slower, but the installed versions and check results should
+   stay the same.
+
+**How to show this in class:** Open the two run links above, select
+**Lint and formatting**, and expand **Check formatting**. Show the changed
+quotes in the two commits. Explain that a non-zero command exit code fails
+the step and the job. Existing console warnings do not fail ESLint here.
+
+**Manuscript basis:** *Advanced Web Engineering*, Chapter 11,
+sections 11.1–11.3 and 11.7–11.8, PDF pages 80–83.
+Action versions and cache behavior were also checked against the official
+[setup-node documentation](https://github.com/actions/setup-node/tree/v6)
+and [checkout documentation](https://github.com/actions/checkout/tree/v6).
 
 ---
 
