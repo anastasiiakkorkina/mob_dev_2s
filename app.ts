@@ -1,4 +1,4 @@
-import { loadAllData } from './modules/data_loading';
+import { loadAllData } from "./modules/data_loading";
 import { setupEventListeners } from "./modules/event_listener";
 import { closeEvidenceDetail, saveCurrentNote } from "./modules/evidence_detail";
 import { handleSortChange, renderEvidenceList } from "./modules/evidence_list";
