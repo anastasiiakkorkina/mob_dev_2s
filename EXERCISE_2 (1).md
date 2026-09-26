@@ -444,6 +444,43 @@ and [checkout documentation](https://github.com/actions/checkout/tree/v6).
 - [ ] What GitHub Actions permission(s) or secret(s) does your deploy workflow actually need, and where did you grant/store them? What's the security risk of over-granting permissions here?
 - [ ] What's the difference between triggering a workflow `on: push`, `on: pull_request`, and `on: workflow_dispatch`? Which did you use for the development workflow (Demo 8) and which for the deployment workflow (Demo 9), and why is that pairing the right one?
 
+**Answers (simple English):**
+
+1. If the build fails, the previously deployed site stays live. Our `deploy`
+   job has `needs: build`, so GitHub skips it when the `build` job fails.
+   The failed version is not published. This is the behavior I want:
+   visitors keep using the last working version while I fix the error.
+   In this demo, assigning `123` to the string field `currentPage` caused
+   TypeScript error TS2322. The `tsc --noEmit` part of `npm run build`
+   stopped the command before Vite or deployment could run. I checked the
+   published site in Chrome after the failure: the previous version was
+   still available.
+
+2. Permissions are configured in `.github/workflows/deployment.yml`.
+   The `build` job has `contents: read` to check out the code and
+   `pages: read` to read Pages settings. The `deploy` job has
+   `pages: write` to publish and `id-token: write` to request an OIDC
+   identity token that GitHub Pages uses to verify the deployment.
+   GitHub provides `GITHUB_TOKEN` automatically; I did not create or store
+   a personal access token or a custom deployment secret for this workflow.
+   In repository **Settings → Pages**, the source is **GitHub Actions**.
+   In **Settings → Environments → github-pages**, the deployment branch
+   `demo9-deployment-workflow` is allowed (the existing `main` rule is
+   also present). Giving unnecessary write permissions would let a
+   compromised action or malicious workflow do more damage, such as
+   changing repository content or publishing an unwanted site.
+
+3. `push` runs a workflow when commits are pushed to matching branches.
+   `pull_request` runs checks when a pull request is opened or updated.
+   `workflow_dispatch` allows a manual run from GitHub's interface or API;
+   the workflow must be present on the default branch for this trigger.
+   Our development workflow uses `push` and `pull_request` to check
+   branch changes and proposed merges. Our deployment workflow uses
+   `push` only for `demo9-deployment-workflow`, the dedicated publishing
+   branch chosen in Demo 9. Neither workflow currently uses
+   `workflow_dispatch`. This pairing gives broad feedback while only
+   changes pushed to the publishing branch update the live site.
+
 ---
 
 ## What to bring to class
