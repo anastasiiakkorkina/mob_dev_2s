@@ -446,41 +446,43 @@ and [checkout documentation](https://github.com/actions/checkout/tree/v6).
 
 **Answers (simple English):**
 
-1. If the build job fails, the `deploy` job is skipped because it declares
-   `needs: build`. No new artifact is published by that run, so a previously
-   deployed version is expected to remain live. That is the desired
-   fail-safe behavior: visitors keep the last successful deployment while
-   the broken commit is fixed. The pushed Demo 10 commit (`c4dcf0c`) adds
-   `const intentionalTypeError: string = 123;` in `app.ts`. Locally,
-   `npm run lint` and `npm run format:check` pass, while
-   `npm run build -- --base=/mob_dev_2s/` fails in `tsc --noEmit` with
-   TS2322, before Vite, artifact upload, or deploy. The commit was pushed to
-   `demo9-deployment-workflow`; inspect its Actions run and the live site to
-   confirm the remote run status and that the prior deployment remains live.
+1. If the build fails, the `deploy` job is skipped because it has
+   `needs: build`. The failed run does not upload a new artifact or replace
+   the last successful Pages deployment, so the previously published app
+   stays live. That is the behavior I want: visitors keep the working version
+   while I fix the error. In [failed deployment run 6](https://github.com/anastasiiakkorkina/mob_dev_2s/actions/runs/36270978285),
+   commit `c4dcf0c` assigned `123` to the `string` variable
+   `intentionalTypeError` in `app.ts`. Lint and formatting passed; the build
+   step ran `tsc --noEmit`, reported TS2322 at `app.ts(35,9)`, and exited
+   with code 2. GitHub skipped `Configure GitHub Pages`, artifact upload, and
+   the `deploy` job. The site remained available at
+   [the Pages URL](https://anastasiiakkorkina.github.io/mob_dev_2s/). The
+   following [successful deployment run 7](https://github.com/anastasiiakkorkina/mob_dev_2s/actions/runs/36271571018)
+   published the restored, valid build.
 
-2. The workflow's `build` job has `contents: read` for checkout and
-   `pages: read`; its `deploy` job has `pages: write` to publish and
-   `id-token: write` for the OIDC token used by GitHub Pages deployment.
-   These job-level permissions are in `.github/workflows/deployment.yml`.
-   The workflow uses GitHub's automatically provided `GITHUB_TOKEN`; no
-   personal access token or custom secret is declared in the workflow.
-   The repository also needs Pages configured to use **GitHub Actions** as
-   its build/deployment source, and the `github-pages` environment controls
-   permitted deployment branches. Confirm those repository settings under
-   **Settings → Pages** and **Settings → Environments → github-pages**.
-   Over-granting permissions increases what a compromised workflow or action
-   can do, such as modifying repository contents or publishing unwanted
-   changes. Keep permissions at the minimum needed for each job.
+2. In `.github/workflows/deployment.yml`, workflow-level `contents: read`
+   allows read-only checkout. The `build` job grants `contents: read` and
+   `pages: read`; the `deploy` job grants `pages: write` to publish and
+   `id-token: write` to request the OIDC token used by GitHub Pages. GitHub
+   provides `GITHUB_TOKEN` automatically; no personal access token or custom
+   secret is needed. I verified **Settings → Pages** is set to **GitHub
+   Actions**. **Settings → Environments → github-pages** has deployment
+   rules for `demo9-deployment-workflow` and `main`, and no environment
+   secrets. Over-granting access gives a compromised action or workflow more
+   power, for example to modify repository contents or publish unwanted
+   changes, so each job should receive only the permissions it needs.
 
 3. `push` runs when commits are pushed to matching branches. `pull_request`
    runs checks for proposed changes when a pull request is opened or updated.
-   `workflow_dispatch` enables a manual run from GitHub's UI or API. The
+   `workflow_dispatch` allows a manual run from GitHub's UI or API. The
    development workflow uses `push` and `pull_request` so branch commits and
-   proposed merges receive fast checks. The deployment workflow uses `push`
-   restricted to `demo9-deployment-workflow`, so only updates to the chosen
-   publishing branch deploy automatically. Neither workflow currently uses
-   `workflow_dispatch`; manual runs would be useful for a deliberate rerun,
-   but are not needed for this push-driven setup.
+   proposed merges receive checks. The deployment workflow uses `push` only
+   for `demo9-deployment-workflow`, so only changes on the chosen publishing
+   branch update the live site. This pairing gives broad feedback during
+   development while limiting automatic publishing to the deployment branch;
+   neither workflow currently uses `workflow_dispatch`. The run history is
+   available for [Development checks](https://github.com/anastasiiakkorkina/mob_dev_2s/actions/workflows/development.yml)
+   and [Deploy to GitHub Pages](https://github.com/anastasiiakkorkina/mob_dev_2s/actions/workflows/deployment.yml).
 
 ---
 
