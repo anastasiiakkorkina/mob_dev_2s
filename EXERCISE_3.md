@@ -240,11 +240,73 @@ To demonstrate: run `npm run dev` and open `/react.html` on the printed local ad
 - [ ] Design and diagram a proposed component hierarchy for the **entire application**, not just the part you're building this exercise. E.g. pages (one per current view) and the reusable components you expect to extract (cards, badges, buttons, form controls, etc.), even though most of them won't be built until Exercises 4 and 5.
 - [ ] For at least 5 components in your diagram, briefly note what data/props each one would need and where that data comes from.
 
+PROPOSED DESIGN: 
+
+```text
+App (shared data, saved user state, current route)
+├── AppHeader
+│   └── Navigation → NavButton
+├── LoadingIndicator / ErrorMessage
+├── Active page (one of the five pages below)
+│   ├── DashboardPage
+│   │   ├── CaseSummary → Badge
+│   │   ├── PortalGuide → Button
+│   │   ├── StatCard (one per statistic)
+│   │   ├── ReviewProgress
+│   │   ├── RecentEvidenceList → EvidenceSummary → Badge
+│   │   └── RecentTimelineList → TimelineSummary
+│   ├── EvidencePage
+│   │   ├── EvidenceFilters → SearchInput, SelectField, Button
+│   │   ├── EvidenceList → EvidenceCard
+│   │   │   └── BookmarkButton, Badge, TagChip
+│   │   └── EvidenceDetail
+│   │       └── Badge, SelectField, NoteEditor, Button
+│   ├── PeopleLocationsPage
+│   │   ├── TabBar
+│   │   ├── PersonCard → EvidenceLink
+│   │   └── LocationCard
+│   ├── TimelinePage
+│   │   ├── TimelineFilters → SelectField
+│   │   ├── TimelineEventCard → Badge, EvidenceLink
+│   │   └── EvidenceQuickView → Modal, EvidenceSummary, Button
+│   └── WorkspacePage
+│       ├── BookmarksList → EvidenceSummary, Button
+│       ├── NotesList → NoteSummary
+│       └── HypothesisForm → SelectField, TextAreaField,
+│                            ConfidenceSlider, Button, SaveStatus
+└── AppFooter
+```
+
+Repeated names mean reusable components, not copies of their implementation. A `Badge` accepts a label and visual variant; different callers can use it for status, relevance, or certainty.
+
+| Component | Main props/data | Where they come from |
+|---|---|---|
+| Navigation | `currentView`, `onNavigate` | App route state, initially read from the URL hash. |
+| CaseSummary | `caseData` | `data/case.json`, loaded by the shared data layer. |
+| StatCard | `label`, `value` | Dashboard calculations from evidence, people, locations and saved bookmarks. |
+| ReviewProgress | `reviewedCount`, `totalCount` | Current evidence records; percentage is calculated from these counts. |
+| EvidenceCard | `evidence`, `isBookmarked`, `onToggleBookmark`, `onOpen` | Evidence JSON plus shared bookmark state restored from `remotion_bookmarks`; callbacks come from the parent. |
+| Badge | `label`, `variant` | The parent maps the record's status, relevance or certainty to a visual style. |
+| EvidenceDetail | `evidence`, related people/locations, `note`, change/save callbacks | Shared loaded records and notes restored from `remotion_notes`. |
+| PersonCard | `person`, related evidence count, `onShowEvidence` | People JSON, a count derived from evidence, and a navigation callback. |
+| TimelineEventCard | `event`, related names, `onOpenEvidence` | Timeline JSON and shared people/location lookup data. |
+| HypothesisForm | `draft`, `people`, `evidence`, `onChange` | Draft restored from `remotion_hypothesis`; options come from loaded records. |
+
+Data plan: keep data used across pages in a shared React state layer above those pages. Pass data and callbacks through props first; use context later if passing props becomes awkward. Keep local UI state, such as an open modal, in the component that needs it. Save bookmarks, notes and the hypothesis to the existing storage keys. Update React state immutably; changing the old plain `state` object alone will not notify React. Derive counts and filtered lists from current data instead of storing duplicate values.
+
 **Questions** (depend on the tasks above)
 
 - [ ] What criteria did you use to decide something should be its own component versus staying inline inside a bigger one?
+
+ANSWER: I extract a component when it is reused, has a clear job, owns useful local behaviour, or makes a large page easier to read. For example, a bookmark button has its own action, and a hypothesis form has several related controls. I keep a simple one-off paragraph or wrapper inline unless separating it improves clarity. I do not need a component for every HTML element.
+
 - [ ] Pick one component in your diagram that appears in more than one place in the app. What made you extract it instead of duplicating its markup, and how does that compare to how the original vanilla app handled (or didn't handle) that same duplication?
+
+ANSWER: I chose `Badge`, which appears in Dashboard summaries and Evidence cards/details, and can also show timeline certainty. One component keeps its markup and styling consistent, so I can change it in one place. The vanilla app has helpers that choose badge classes, but several render functions still build their own `<span>` strings. The React component would reuse both the markup and its inputs instead of only reusing the class helper.
+
 - [ ] Your diagram includes components you won't build until later exercises. Why is it useful to design the whole hierarchy now rather than only diagramming what you're about to build?
+
+ANSWER: It helps me see what pages share before I build them. I can choose where common data lives and avoid creating separate, conflicting copies of bookmarks or notes. It also shows how the first Dashboard components can be reused later. This is a starting plan, and I can adjust it when implementation reveals a better structure.
 
 ---
 
@@ -255,10 +317,27 @@ To demonstrate: run `npm run dev` and open `/react.html` on the printed local ad
 - [ ] Argue whether an SPA built with React is actually the right architecture for *this specific app*, given what it does.
 - [ ] Include honest trade-offs or downsides of the SPA/React choice for this app, not just the benefits.
 
+ARCHITECTURE DECISION RECORD — Proposed SPA/React migration
+
+Context: This portal has five connected views, evidence filters, bookmarks, editable notes and a saved hypothesis. Users repeatedly move between views while working with the same case data. The existing implementation is already a vanilla CSR SPA, not a server-rendered app.
+
+Decision: Keep SPA navigation and gradually migrate the UI to React with TypeScript. Use the separate React preview during migration. React is a reasonable choice for shared, changing UI state and reusable components; it is not the only way to build this portal.
+
+Benefits: Navigation keeps the document alive and can preserve temporary state. Components let me reuse cards and controls. When shared React state changes, the affected UI can reflect the new data without manually calling every render function. TypeScript helps check the data passed between components.
+
+Costs: React adds JavaScript to download and execute, dependencies to maintain, and concepts to learn. A CSR interface still needs JavaScript before its main content is usable. Large lists, unnecessary renders and slow data loading still need attention. We must manage routing, persistence, loading and errors explicitly; React alone does not solve them. Local storage remains browser-specific and does not provide cross-device sync. For a small, mostly static portal, keeping vanilla code or using a lighter library could be simpler.
+
+Alternatives: Keep the current vanilla SPA and improve its state/rendering structure; use a lighter component library; or build a server-rendered MPA/hybrid with small client interactions. Reconsider the decision if no-JavaScript access, very low-end devices or poor connections become hard requirements.
+
 **Questions** (depend on the tasks above)
 
 - [ ] What would you lose by keeping this app as server-rendered vanilla HTML/JS instead? What would you lose by choosing React specifically over a *different* SPA approach (e.g. vanilla JS with a router, or a lighter library)?
+
+ANSWER: Our current app is actually a client-rendered vanilla SPA. If we changed it to a traditional server-rendered MPA, full-page navigation would reset temporary browser memory unless we explicitly preserved it. Keeping filters, open items and edits between pages would need URL, storage or server-session handling. We could still build interactive features with vanilla JavaScript, so SSR does not make them impossible. Choosing React over a vanilla SPA or lighter library adds runtime size, dependencies and learning effort. In return, I get a standard component model and state-driven rendering, which can make this growing interface easier to maintain.
+
 - [ ] If this app needed to support users on very low-end devices or poor connections as a hard requirement, would you stick with SPA or change the architecture? Why or why not?
+
+ANSWER: I would favour server-rendered pages or a hybrid with small client-side enhancements. The main case content could arrive as readable HTML instead of waiting for a large client runtime and several data requests. That reduces initial browser work and can support reading without JavaScript. I would keep JavaScript where it helps, such as bookmarks or filters, and load extra code/data only when needed. Server rendering still has network and server costs, so I would measure loading time on the target devices and connections before finalising the choice.
 
 ---
 
@@ -273,7 +352,14 @@ To demonstrate: run `npm run dev` and open `/react.html` on the printed local ad
 
 - [ ] How does "the current view" get tracked in your React shell? Compare this directly to how `currentPage` and `handleHashChange()` did it in the vanilla version? What's actually
 different, and what's superficially different but conceptually the same?
+
+ANSWER: My React shell tracks `currentView` with typed `useState`. It starts from the URL hash using `readView()` in `react/routing.tsx`. Clicking a navigation button changes the hash; a `hashchange` listener updates React state. `useEffect` registers the listener and removes it during cleanup. This also handles Back and Forward. The vanilla `handleHashChange()` changes the plain `state.currentPage`, manually toggles classes, and calls render functions. In React, a state change triggers rendering of the selected page and its active button class. Both still use hash-based SPA navigation without a document reload. State-driven rendering is the real difference; renaming the variable is only superficial. Only the selected page is mounted in React, so page-local state can reset when leaving it. Shared state should live above the pages.
+
 - [ ] What happens in your shell if a user navigates to a view that doesn't exist? How does that compare to the vanilla app's fallback-to-dashboard behavior?
+
+ANSWER: `readView()` accepts only the five known view names. An empty or unknown hash, such as `#unknown`, shows Dashboard and highlights its button. This matches the vanilla fallback. Both leave the unknown hash in the address bar instead of rewriting the URL. The TypeScript `View` type prevents invalid names in our typed navigation code, but values entered in the URL still need this runtime check.
+
+To demonstrate: open `/react.html`, click all five buttons and watch the heading, active button and hash change. Try Back/Forward, reload with `#timeline`, and enter `#unknown`. The four other pages are placeholders; real Dashboard data belongs to Demo 10
 
 ---
 
