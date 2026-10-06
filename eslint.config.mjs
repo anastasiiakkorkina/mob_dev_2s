@@ -10,7 +10,7 @@ export default [
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ["app.ts", "modules/**/*.ts"],
+    files: ["app.ts", "modules/**/*.ts", "react/**/*.tsx", "vite.config.mts"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",

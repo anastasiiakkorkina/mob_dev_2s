@@ -218,8 +218,18 @@ renders *something* visible, without removing the working vanilla app yet.
 **Questions** (depend on the tasks above)
 
 - [ ] What did you actually have to install and configure to get JSX compiling through Vite? What is each piece responsible for?
+
+ANSWER: TypeScript and Vite were already installed. I added `react` for components and `react-dom` to render them in the browser. I added `@types/react` and `@types/react-dom` for TypeScript checking and editor suggestions, plus `@vitejs/plugin-react` for React integration and Fast Refresh during development. In `vite.config.mts`, I enabled `react()` and included both HTML entry pages in the production build. In `tsconfig.json`, I set `jsx` to `react-jsx` and included the new `.tsx` files. Vite transforms TSX into browser JavaScript; `tsc --noEmit` separately checks types before development or a build. I also included the new files in our lint and formatting commands.
+
 - [ ] How does your `<App />` component get from source code onto the actual page? Trace the path from your `.tsx` file to the DOM.
+
+ANSWER: I open `/react.html`. It contains an empty `<div id="react-root">` and a module script pointing to `react/main.tsx`. Vite transforms the TypeScript and JSX into JavaScript. `main.tsx` imports `App` from `react/App.tsx`, finds the container, and calls `createRoot(container).render(<StrictMode><App /></StrictMode>)`. React calls `App()` to get the UI description, and React DOM creates the actual elements inside the container. I see the Project ReMotion heading, a React Preview card, and a link to the working portal. `StrictMode` helps detect mistakes during development.
+
 - [ ] What decision did you make about how the vanilla and React versions coexist during migration, and why? What would go wrong with an opposite choice?
+
+ANSWER: I kept two separate entry pages: `/index.html` runs the working vanilla app, and `/react.html` runs the small React preview. They share the existing CSS, but the React page does not load `app.ts`. This lets me test React while all existing features remain available. Vite builds both pages, so the preview also works in a production build. A full swap now would remove working features because the React version is only a placeholder. If both versions tried to control the same DOM, manual updates and React updates could overwrite each other. I can migrate the shell and views gradually and remove the old entry when the replacement is ready.
+
+To demonstrate: run `npm run dev` and open `/react.html` on the printed local address. Follow the link back to the vanilla Dashboard. For a production check, run `npm run build`, then `npm run preview`, and open both pages. [Vite React plugin](https://vite.dev/plugins/), [React with TypeScript](https://react.dev/learn/typescript), [React DOM createRoot](https://react.dev/reference/react-dom/client/createRoot).
 
 ---
 

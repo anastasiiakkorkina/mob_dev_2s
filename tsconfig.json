@@ -5,9 +5,10 @@
     "moduleResolution": "Bundler",
     "lib": ["ES2022", "DOM"],
     "strict": true,
+    "jsx": "react-jsx",
     "allowJs": false,
     "noEmit": true,
     "skipLibCheck": true
   },
-  "include": ["app.ts", "modules/**/*.ts"]
+  "include": ["app.ts", "modules/**/*.ts", "react/**/*.tsx", "vite.config.mts"]
 }
