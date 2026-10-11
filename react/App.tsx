@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import AppHeader from "./AppHeader";
 import { StubPage } from "./pages";
 import DashboardPage from "./DashboardPage";
+import PeopleLocationsPage from "./PeopleLocationsPage";
 import { useCaseData } from "./useCaseData";
 import { readView, type View } from "./routing";
 
@@ -25,11 +26,19 @@ export default function App() {
     <>
       <AppHeader currentView={currentView} onNavigate={navigate} />
       <main id="app" className="app-main">
-        {currentView === "dashboard" ? (
+        {currentView === "dashboard" || currentView === "people" ? (
           error ? (
             <p role="alert">{error}</p>
           ) : data ? (
-            <DashboardPage data={data} />
+            currentView === "dashboard" ? (
+              <DashboardPage data={data} />
+            ) : (
+              <PeopleLocationsPage
+                people={data.people}
+                locations={data.locations}
+                evidence={data.evidence}
+              />
+            )
           ) : (
             <p role="status">Loading case file…</p>
           )
