@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import AppHeader from "./AppHeader";
-import { DashboardPage, StubPage } from "./pages";
+import { StubPage } from "./pages";
+import DashboardPage from "./DashboardPage";
+import { useCaseData } from "./useCaseData";
 import { readView, type View } from "./routing";
 
 export default function App() {
+  const { data, error } = useCaseData();
   const [currentView, setCurrentView] = useState<View>(() => readView(window.location.hash));
 
   useEffect(() => {
@@ -23,7 +26,13 @@ export default function App() {
       <AppHeader currentView={currentView} onNavigate={navigate} />
       <main id="app" className="app-main">
         {currentView === "dashboard" ? (
-          <DashboardPage />
+          error ? (
+            <p role="alert">{error}</p>
+          ) : data ? (
+            <DashboardPage data={data} />
+          ) : (
+            <p role="status">Loading case file…</p>
+          )
         ) : (
           // StubPage means that the page is not implemented yet, but we still want to show the user that the page exists and is accessible
           <StubPage key={currentView} view={currentView} />

@@ -32,7 +32,7 @@ These checkboxes are for self-checking. Don't forget to do the actual checking o
 | 7 | Component hierarchy for the whole app | ☐ |
 | 8 | Architecture Decision Record: why SPA/React | ☐ |
 | 9 | Migrate the application shell | ☐ |
-| 10 | Migrate the Dashboard view | ☐ |
+| 10 | Migrate the Dashboard view | ☑ |
 
 A demo only counts as "Ready" once **every** task and question checkbox inside it (below) is
 ticked — the table above is just a fast overview, tick the boxes inside each demo first.
@@ -367,15 +367,27 @@ To demonstrate: open `/react.html`, click all five buttons and watch the heading
 
 **Tasks**
 
-- [ ] Rebuild the Dashboard view as React components (using your hierarchy from Demo 7 as a starting point), rendering the case summary, stat cards, review progress, and the recent
+- [x] Rebuild the Dashboard view as React components (using your hierarchy from Demo 7 as a starting point), rendering the case summary, stat cards, review progress, and the recent
 evidence/timeline lists. Reading from the same data your app already loads.
-- [ ] Confirm it renders correctly with real data, and that navigating away and back doesn't lose or corrupt anything.
+- [x] Confirm it renders correctly with real data, and that navigating away and back doesn't lose or corrupt anything.
 
 **Questions** (depend on the tasks above)
 
-- [ ] Where does the Dashboard's data (case info, evidence, timeline) come from in your React version, and how does it get to the components that render it? Is this the final architecture you intend to keep, or a placeholder you know you'll change in a later exercise?
-- [ ] The old vanilla dashboard had a real bug where it could show stale numbers because it only re-rendered on a view's *first* visit (a manual render-cache flag). Does your React version have an equivalent risk? Why or why not, given how React re-renders?
-- [ ] What, if anything, does your React Dashboard do differently from the vanilla one in terms of *when* it recalculates derived values (like the review-progress percentage)?
+- [x] Where does the Dashboard's data (case info, evidence, timeline) come from in your React version, and how does it get to the components that render it? Is this the final architecture you intend to keep, or a placeholder you know you'll change in a later exercise?
+
+ANSWER: `useCaseData()` in App fetches the same five JSON files as the vanilla app and restores bookmarks from `remotion_bookmarks` in localStorage. App owns the loaded React state and passes it to DashboardPage, which passes relevant records/counts to its child components. Keeping shared state above pages is the intended architecture; this read-only loading hook is a migration starting point. Later exercises will add immutable update callbacks and persistence for editable data, and may introduce context.
+- [x] The old vanilla dashboard had a real bug where it could show stale numbers because it only re-rendered on a view's *first* visit (a manual render-cache flag). Does your React version have an equivalent risk? Why or why not, given how React re-renders?
+
+ANSWER: There is no first-visit render-cache flag. Updating React state triggers rendering, and returning to Dashboard mounts it again with the current data held in App. React does not observe arbitrary global mutations: future evidence/bookmark edits must update React state immutably. This version loads a snapshot; it does not automatically synchronise later edits made in the separate vanilla page.
+- [x] What, if anything, does your React Dashboard do differently from the vanilla one in terms of *when* it recalculates derived values (like the review-progress percentage)?
+
+ANSWER: The vanilla dashboard recalculates values only when our code explicitly calls renderDashboard(). React recalculates the reviewed count, percentage and recent lists whenever those components render, including after a data update or returning to Dashboard. These small calculations are derived directly from props, without duplicate state or memoisation; a render does not necessarily mean every DOM node changes.
+
+---
+
+IMPLEMENTATION / VERIFICATION: Added CaseSummary, Badge, StatCard, ReviewProgress, RecentEvidenceList and RecentTimelineList. Loading/errors are explicit; effect cleanup aborts obsolete requests. Sorting/reversing uses copies to keep shared data unchanged. `npm run build` passes; `npm run lint` has only the nine existing vanilla console warnings. A headless Chrome check against real JSON confirmed 18 evidence items, 6 people, 6 locations, 1 reviewed item and 6% progress, correct recent evidence order, and identical Dashboard markup after visiting each of the four stub views and returning. Screenshot inspected for layout. Development Strict Mode can start an extra aborted fetch batch; navigation does not reload the data.
+
+To demonstrate: open `/react.html`, inspect the statistics and recent lists, then visit Evidence, People & Locations, Timeline and Workspace and return to Dashboard. Other views are still placeholders.
 
 ---
 
