@@ -1,5 +1,6 @@
 import type { PersonRecord } from "../modules/state";
 import Card from "./Card";
+import PersonStatement from "./PersonStatement";
 
 interface PersonCardProps {
   person: PersonRecord;
@@ -19,14 +20,18 @@ export default function PersonCard({ person, evidenceCount }: PersonCardProps) {
       <p>
         <strong>Speciality:</strong> {person.speciality}
       </p>
-      <ul>
-        {person.responsibilities.map((responsibility) => (
-          <li key={responsibility}>{responsibility}</li>
-        ))}
-      </ul>
-      <div className="person-statement">“{person.statement}”</div>
+      {person.responsibilities.length > 0 && (
+        <ul>
+          {person.responsibilities.map((responsibility) => (
+            <li key={responsibility}>{responsibility}</li>
+          ))}
+        </ul>
+      )}
+      <PersonStatement statement={person.statement} />
       <p>
-        {evidenceCount} related evidence {evidenceCount === 1 ? "item" : "items"}
+        {evidenceCount === 0
+          ? "No related evidence yet."
+          : `${evidenceCount} related evidence ${evidenceCount === 1 ? "item" : "items"}`}
       </p>
     </Card>
   );

@@ -86,13 +86,36 @@ The checked items above mean implemented/answered. The Self-Check readiness tabl
 
 **Tasks**
 
-- [ ] Implement at least two real conditional-rendering cases in the views you're migrating. For example: an empty state (e.g. "no timeline events match" if applicable), and a state-dependent style/label (e.g. the active People/Locations tab, or a certainty badge's variant on a timeline event).
-- [ ] Use at least two different conditional-rendering techniques (e.g. a ternary, `&&`, early-return, or a lookup/mapping function) and be ready to justify which you used where.
+- [x] Implement at least two real conditional-rendering cases in the views you're migrating. For example: an empty state (e.g. "no timeline events match" if applicable), and a state-dependent style/label (e.g. the active People/Locations tab, or a certainty badge's variant on a timeline event).
+- [x] Use at least two different conditional-rendering techniques (e.g. a ternary, `&&`, early-return, or a lookup/mapping function) and be ready to justify which you used where.
 
 **Questions** (depend on the tasks above)
 
-- [ ] Show one place where you used `condition && <Component />}` instead of a ternary. What would go wrong if `condition` were a number like `0` instead of a boolean and does that risk apply to your actual code?
-- [ ] Why might returning `null` from a component be preferable to returning an empty `<div>` in some cases? Did you use either, and why?
+- [x] Show one place where you used `condition && <Component />}` instead of a ternary. What would go wrong if `condition` were a number like `0` instead of a boolean and does that risk apply to your actual code?
+- [x] Why might returning `null` from a component be preferable to returning an empty `<div>` in some cases? Did you use either, and why?
+
+
+### Implementation and how to demonstrate
+
+Based on Chapter 16, section 16.1 (PDF pp. 110–111). All new rendering depends on typed props; no new state or manual DOM changes are used.
+
+- **Ternary:** `PeopleLocationsPage` shows either an empty message or the corresponding card grid. `PersonCard` also chooses between "No related evidence yet." and the count label. A ternary fits two alternative results.
+- **Logical AND:** `person.responsibilities.length > 0 && (...)` shows the responsibilities list only when there are entries. It fits optional content with no alternative.
+- **Early return:** `PersonStatement` returns `null` when `statement.trim() === ""`; otherwise it renders the quotation. It keeps the absent-content case separate and creates no empty element.
+
+Run `npm run dev` and open `/react.html#people`. To demonstrate the other branches, temporarily change props in the `PeopleLocationsPage` call in `App.tsx` (do not change the JSON files):
+
+1. Pass `people={[]}`: "No people loaded yet." replaces the people grid; locations still appear.
+2. Restore people and pass `locations={[]}`: "No locations loaded yet." replaces the locations grid.
+3. Restore locations and pass `evidence={[]}`: all person cards show "No related evidence yet.".
+4. Restore evidence. Temporarily pass `people={data.people.map((person) => ({ ...person, responsibilities: [], statement: "   " }))}`: cards keep their other fields, but the responsibilities list and quotation disappear. In browser Elements, no statement div or responsibilities ul is present.
+5. Restore all original props after the demonstration.
+
+### Short answers
+
+**1. Logical AND and zero.** In `PersonCard`, I use `{person.responsibilities.length > 0 && (<ul>...</ul>)}`. When the boolean condition is false, React renders nothing. With `length && (...)`, an empty array would produce the number `0`, which React renders as visible text. My code avoids this because `length > 0` always produces a boolean.
+
+**2. Returning null.** `null` means the component renders nothing. An empty `<div>` still creates a DOM element and can affect spacing, layout, or CSS. I use `return null` in `PersonStatement` when the statement is empty or whitespace-only, so there is no empty quotation box or decorative border. I do not use an empty div as a substitute.
 
 ---
 
