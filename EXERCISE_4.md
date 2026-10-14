@@ -205,7 +205,7 @@ The classification describes the current responsibility, not the file name. Pres
 | `AppHeader` | Presentational | Shows navigation from props and calls the supplied navigation callback. |
 | `StubPage` | Presentational | Shows a placeholder for the supplied view; does not navigate. |
 | `DashboardPage` | Feature/container | Derives case statistics and composes dashboard sections. |
-| `Badge` | Presentational | Shows a supplied label and CSS class. |
+| `Badge` | Presentational | Shared by Dashboard and Timeline; shows a supplied label and typed visual tone. |
 | `CaseSummary` | Presentational | Displays the supplied case record. |
 | `StatCard` | Presentational | Displays a supplied number and label. |
 | `ReviewProgress` | Presentational | Converts supplied counts to a visual percentage. |
@@ -265,9 +265,9 @@ See `ARCHITECTURE.md` for the complete tree and placement rules. React source no
 
 ### Short answers
 
-**1. By type vs. by feature.** By type puts all components in one folder and all hooks in another. By feature keeps files for the same user task together. I chose features because our Dashboard, People & Locations, and Timeline are distinct views. I can find a page and its local components in one place. App-wide loading and navigation stay in `app/`.
+**1. By type vs. by feature.** By type groups all components together and all hooks together. By feature groups files for the same app task. I chose features because Dashboard, People & Locations, and Timeline are separate views, so their related files are easier to find.
 
-**2. Feature-local vs. shared.** I keep domain-specific components inside their feature. For example, `features/timeline/components/TimelineEventCard.tsx` knows about event time and certainty. I use shared for generic contracts with real reuse: `shared/components/Card.tsx` wraps children and is already used by both PersonCard and LocationCard. Those callers are currently in one feature, but Card itself has no domain-specific data. Being presentational alone does not make a component shared.
+**2. Feature-local vs. shared.** A component stays in its feature when it knows that feature's data, like `TimelineEventCard` with event time and certainty. A generic component with real reuse belongs in shared, like `Badge`, used by Dashboard and Timeline. Being presentational alone does not make a component shared.
 
 ---
 
@@ -275,12 +275,30 @@ See `ARCHITECTURE.md` for the complete tree and placement rules. React source no
 
 **Tasks**
 
-- [ ] Extract at least one presentational component that is genuinely reused in **two or more different places** in the app (e.g. a badge, a card shell, a button variant), with a typed props API that makes it flexible enough for both uses without becoming a special-cased mess.
+- [x] Extract at least one presentational component that is genuinely reused in **two or more different places** in the app (e.g. a badge, a card shell, a button variant), with a typed props API that makes it flexible enough for both uses without becoming a special-cased mess.
 
 **Questions** (depend on the tasks above)
 
-- [ ] Show the two (or more) places your reusable component is used. What varies between them via props, and what stays fixed inside the component itself? How did you decide where that line goes?
-- [ ] The original vanilla app had duplicated HTML-template code (the same card markup written out twice, slightly differently, in two functions). Compare that directly to what you just built. What does a reusable component give you that copy-pasted template strings didn't?
+- [x] Show the two (or more) places your reusable component is used. What varies between them via props, and what stays fixed inside the component itself? How did you decide where that line goes?
+- [x] The original vanilla app had duplicated HTML-template code (the same card markup written out twice, slightly differently, in two functions). Compare that directly to what you just built. What does a reusable component give you that copy-pasted template strings didn't?
+
+
+### Implementation and demonstration
+
+`react/shared/components/Badge.tsx` extracts the Dashboard's local badge and replaces Timeline's inline badge markup. Its typed props are `label: string` and `tone: "neutral" | "positive" | "warning" | "critical"`. The component has no state or domain-specific branches. Search for `demo7` to find the implementation and call sites.
+
+Real uses:
+
+- `react/features/dashboard/DashboardPage.tsx`: case status in `CaseSummary` and evidence status in `RecentEvidenceList`.
+- `react/features/timeline/components/TimelineEventCard.tsx`: event certainty.
+
+Run `npm run dev`; open `/react.html#dashboard` to show case and evidence badges, then `/react.html#timeline` to show certainty badges. Existing CSS classes and visible labels are preserved. Show the shared component and both feature imports.
+
+### Short answers
+
+**1. What varies and what stays fixed?** Dashboard uses `Badge` for case/evidence status; Timeline uses it for event certainty. The `label` and `tone` props vary. The span, base CSS class, and tone-to-CSS mapping stay fixed. Features choose the meaning; Badge handles the repeated visual structure.
+
+**2. Compared with copied HTML templates.** The vanilla `people_locations.ts` repeats card wrappers, and `evidence_list.ts` and `timeline.ts` repeat badge HTML strings. Shared `Card` and `Badge` keep that markup in one place. One edit updates all callers, typed props catch wrong inputs, and copied templates no longer drift apart.
 
 ---
 

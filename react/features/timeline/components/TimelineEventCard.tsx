@@ -1,5 +1,8 @@
 import type { TimelineEvent } from "../../../../modules/state";
 import { formatDate } from "../../../../modules/lookup_helpers";
+// demo7
+// Timeline shares badge markup with Dashboard but keeps its certainty rules local.
+import Badge, { type BadgeTone } from "../../../shared/components/Badge";
 
 interface TimelineEventCardProps {
   event: TimelineEvent;
@@ -8,20 +11,23 @@ interface TimelineEventCardProps {
 // demo3
 // One component displays one event; the parent supplies its record.
 export default function TimelineEventCard({ event }: TimelineEventCardProps) {
-  const badgeClass =
+  // demo7
+  // Translate event certainty into the shared component's visual contract.
+  const badgeTone: BadgeTone =
     event.certainty === "confirmed"
-      ? "badge-reviewed"
+      ? "positive"
       : event.certainty === "contradictory"
-        ? "badge-critical"
+        ? "critical"
         : event.certainty === "reported"
-          ? "badge-flagged"
-          : "badge-unreviewed";
+          ? "warning"
+          : "neutral";
 
   return (
     <article className={`timeline-event certainty-${event.certainty}`}>
       <div className="timeline-time">
         <time dateTime={event.time}>{formatDate(event.time)}</time> ·{" "}
-        <span className={`badge ${badgeClass}`}>{event.certainty}</span>
+        {/* demo7: same Badge component, with Timeline-specific inputs. */}
+        <Badge label={event.certainty} tone={badgeTone} />
       </div>
       <h3>{event.title}</h3>
       <p>{event.description}</p>

@@ -1,17 +1,17 @@
 import type { CaseRecord, EvidenceRecord, TimelineEvent } from "../../../modules/state";
-import { formatDate, getStatusBadgeClass } from "../../../modules/lookup_helpers";
+import { formatDate } from "../../../modules/lookup_helpers";
 import type { CaseData } from "../../app/useCaseData";
-
-function Badge({ label, className }: { label: string; className: string }) {
-  return <span className={`badge ${className}`}>{label}</span>;
-}
+// demo7
+// Reuse the shared visual component instead of a Dashboard-only badge.
+import Badge from "../../shared/components/Badge";
 
 function CaseSummary({ caseData }: { caseData: CaseRecord }) {
   return (
     <div className="case-summary-card">
       <h3>{caseData.title || "Case"}</h3>
       <p>
-        <Badge label={(caseData.status || "unknown").toUpperCase()} className="badge-flagged" />
+        {/* demo7: the case summary supplies its own label and warning tone. */}
+        <Badge label={(caseData.status || "unknown").toUpperCase()} tone="warning" />
       </p>
       <p>{caseData.summary}</p>
     </div>
@@ -66,7 +66,17 @@ function RecentEvidenceList({ evidence }: { evidence: EvidenceRecord[] }) {
       {recent.map((item) => (
         <div className="mini-list-item" key={item.id}>
           <strong>{item.id}</strong> — {item.title}{" "}
-          <Badge label={item.status} className={getStatusBadgeClass(item.status)} />
+          {/* demo7: evidence status is mapped to a visual tone here, not inside Badge. */}
+          <Badge
+            label={item.status}
+            tone={
+              item.status.toLowerCase() === "reviewed"
+                ? "positive"
+                : item.status.toLowerCase() === "flagged"
+                  ? "warning"
+                  : "neutral"
+            }
+          />
         </div>
       ))}
     </div>
