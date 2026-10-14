@@ -3,6 +3,9 @@ import AppHeader from "./AppHeader";
 import { StubPage } from "./pages";
 import DashboardPage from "./DashboardPage";
 import PeopleLocationsPage from "./PeopleLocationsPage";
+// demo3
+// Timeline now renders the loaded event collection in React.
+import TimelinePage from "./TimelinePage";
 import { useCaseData } from "./useCaseData";
 import { readView, type View } from "./routing";
 
@@ -26,17 +29,22 @@ export default function App() {
     <>
       <AppHeader currentView={currentView} onNavigate={navigate} />
       <main id="app" className="app-main">
-        {currentView === "dashboard" || currentView === "people" ? (
+        {currentView === "dashboard" || currentView === "people" || currentView === "timeline" ? (
           error ? (
             <p role="alert">{error}</p>
           ) : data ? (
             currentView === "dashboard" ? (
               <DashboardPage data={data} />
+            ) : currentView === "timeline" ? (
+              <TimelinePage events={data.timeline} />
             ) : (
               <PeopleLocationsPage
                 people={data.people}
+                // people={[]}
                 locations={data.locations}
+                // locations={[]}
                 evidence={data.evidence}
+                // evidence={[]}
               />
             )
           ) : (

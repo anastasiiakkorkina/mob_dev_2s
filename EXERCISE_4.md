@@ -123,11 +123,27 @@ Run `npm run dev` and open `/react.html#people`. To demonstrate the other branch
 
 **Tasks**
 
-- [ ] Render the people list, the locations list, and the timeline events list, each as a mapped collection of components, each with a proper `key` prop.
+- [x] Render the people list, the locations list, and the timeline events list, each as a mapped collection of components, each with a proper `key` prop.
 
 **Questions** (depend on the tasks above)
 
-- [ ] What does React actually use `key` for internally?
+- [x] What does React actually use `key` for internally?
+
+
+### Implementation and how to demonstrate
+
+- `react/PeopleLocationsPage.tsx`: `people.map(...)` renders `PersonCard` with `key={person.id}`; `locations.map(...)` renders `LocationCard` with `key={location.id}`.
+- `react/TimelinePage.tsx`: a sorted copy of the events is mapped to `TimelineEventCard` with `key={event.id}`. The input array is not changed.
+- `react/TimelineEventCard.tsx`: typed props describe one event; the card shows the time, title, description, certainty, and related IDs.
+- `react/App.tsx`: connects Timeline to the existing navigation and loaded data. Loading and error messages also apply to Timeline.
+
+Search for `demo3` in the React files to find the new collection code and short English comments. Inside JSX, comments use `{/* ... */}`; in JavaScript they use `// ...`.
+
+Run `npm run dev`. Open `/react.html#people` to show people and locations, then click Timeline or open `/react.html#timeline`. Compare `data/timeline.json` with the rendered events. The current data contains 6 people, 6 locations, and 15 timeline events. Timeline is presentational: filter controls and URL parameters are left for later demos.
+
+### Short answer
+
+**What does React use key for internally?** React uses `key` to match an item in the old list with the same item in the new list during reconciliation. Together with the element type, it helps React preserve the correct component state and DOM nodes when items move, appear, or disappear. Keys must be stable and unique among siblings. I use record IDs, not array positions. `key` is not a normal prop and is not shown in the HTML; the component receives the record through a separate prop.
 
 ---
 

@@ -13,6 +13,7 @@ export default function PersonCard({ person, evidenceCount }: PersonCardProps) {
       <div className="person-card-header">
         <img className="person-avatar" src={person.avatar} alt={`Portrait of ${person.name}`} />
         <div>
+          {/* DEMO 1 */}
           <h3>{person.name}</h3>
           <div className="person-role">{person.role}</div>
         </div>
@@ -20,6 +21,8 @@ export default function PersonCard({ person, evidenceCount }: PersonCardProps) {
       <p>
         <strong>Speciality:</strong> {person.speciality}
       </p>
+
+      {/* DEMO 2 */}
       {person.responsibilities.length > 0 && (
         <ul>
           {person.responsibilities.map((responsibility) => (
@@ -29,6 +32,7 @@ export default function PersonCard({ person, evidenceCount }: PersonCardProps) {
       )}
       <PersonStatement statement={person.statement} />
       <p>
+        {/* DEMO 2 */}
         {evidenceCount === 0
           ? "No related evidence yet."
           : `${evidenceCount} related evidence ${evidenceCount === 1 ? "item" : "items"}`}
