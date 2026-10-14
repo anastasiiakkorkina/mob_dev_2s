@@ -9,7 +9,7 @@ react/
   app/
     App.tsx                        # Data and page composition
     AppHeader.tsx                  # Shared application shell
-    routing.tsx                    # Existing hash navigation
+    routing.tsx                    # React Router navigation metadata
     StubPage.tsx                   # Placeholder views
     useCaseData.ts                 # Application-wide data loading
   features/
@@ -47,9 +47,14 @@ The app folder owns the shell, navigation, and application-wide loading. Teachin
 
 By type groups all components together and all hooks together. By feature keeps related work together, such as the Timeline page and its cards. This portal has distinct Dashboard, People & Locations, and Timeline views, so feature folders make related changes easier to find. Small `components/` folders inside a feature are still feature-oriented: they do not mix unrelated views.
 
-Folder location and component responsibility are separate decisions. `TimelinePage` is a feature component and `TimelineList` is presentational, but both belong to Timeline. This change reorganises files and imports; it does not introduce a routing library or new state.
+Folder location and component responsibility are separate decisions. `TimelinePage` is a feature component and `TimelineList` is presentational, but both belong to Timeline. Demo 6 reorganised files and imports; Demo 8 later added React Router without introducing local tab state.
 
 
 ## Demo 7: shared Badge
 
 `shared/components/Badge.tsx` is used in Dashboard case/evidence summaries and Timeline event cards. Its label and visual tone vary; its span markup and CSS mapping stay shared. Domain-to-tone decisions remain in each feature. This is real reuse across two features with no feature-specific flags.
+
+
+## Demo 8: routes and deployment
+
+The portal uses React Router's `HashRouter` because `react.html` is a separate entry on a static host. Routes are `/dashboard`, `/team/people`, `/team/locations`, and `/timeline` inside the URL hash. `AppRoutes` selects pages, while `App` keeps loaded records above navigation. `NavLink` derives active navigation and tab styles from the URL. Unknown routes redirect to `/dashboard` with replacement. Evidence and Workspace remain placeholders. No server fallback rewrite is needed for hash URLs.

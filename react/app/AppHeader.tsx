@@ -1,11 +1,9 @@
-import { views, type View } from "./routing";
+// demo8
+// NavLink supplies real links and derives the active state from the URL.
+import { NavLink } from "react-router";
+import { views } from "./routing";
 
-interface AppHeaderProps {
-  currentView: View;
-  onNavigate: (view: View) => void;
-}
-
-export default function AppHeader({ currentView, onNavigate }: AppHeaderProps) {
+export default function AppHeader() {
   return (
     <header className="app-header">
       <div className="header-inner">
@@ -20,16 +18,13 @@ export default function AppHeader({ currentView, onNavigate }: AppHeaderProps) {
         </div>
         <nav className="main-nav" aria-label="Main navigation">
           {views.map((view) => (
-            <button
+            <NavLink
               key={view.id}
-              type="button"
-              className={`nav-btn${currentView === view.id ? " active" : ""}`}
-              // aria-current is used by screen readers to indicate the current page in a navigation menu
-              aria-current={currentView === view.id ? "page" : undefined}
-              onClick={() => onNavigate(view.id)}
+              to={view.path}
+              className={({ isActive }) => `nav-btn${isActive ? " active" : ""}`}
             >
               {view.label}
-            </button>
+            </NavLink>
           ))}
         </nav>
       </div>

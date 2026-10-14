@@ -96,6 +96,8 @@ h4 {
 }
 
 .nav-btn {
+  /* demo8: navigation is now an anchor link. */
+  text-decoration: none;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.25);
   color: #e8ecf5;
@@ -569,6 +571,9 @@ a:focus-visible {
 }
 
 .tab-btn {
+  /* demo8: preserve button styling on route links. */
+  text-decoration: none;
+  color: var(--color-text);
   padding: 8px 16px;
   border-radius: var(--radius);
   border: 1px solid var(--color-border);

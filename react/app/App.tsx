@@ -1,59 +1,74 @@
-import { useEffect, useState } from "react";
+import { Navigate, Route, Routes } from "react-router";
 import AppHeader from "./AppHeader";
 import { StubPage } from "./StubPage";
 import DashboardPage from "../features/dashboard/DashboardPage";
 import PeopleLocationsPage from "../features/people-locations/PeopleLocationsPage";
-// demo3
-// Timeline now renders the loaded event collection in React.
 import TimelinePage from "../features/timeline/TimelinePage";
-import { useCaseData } from "./useCaseData";
-import { readView, type View } from "./routing";
+import { useCaseData, type CaseData } from "./useCaseData";
 
-export default function App() {
-  const { data, error } = useCaseData();
-  const [currentView, setCurrentView] = useState<View>(() => readView(window.location.hash));
+interface AppRoutesProps {
+  data: CaseData | null;
+  error: string;
+}
 
-  useEffect(() => {
-    // URL changes also cover the browser's Back and Forward buttons
-    const handleHashChange = () => setCurrentView(readView(window.location.hash));
-    window.addEventListener("hashchange", handleHashChange);
-    handleHashChange();
-    return () => window.removeEventListener("hashchange", handleHashChange);
-  }, []);
-
-  const navigate = (view: View) => {
-    window.location.hash = view;
-  };
+// demo8
+// Explicit routes replace manual hash listeners and currentView state.
+export function AppRoutes({ data, error }: AppRoutesProps) {
+  const pending = error ? <p role="alert">{error}</p> : <p role="status">Loading case file…</p>;
 
   return (
-    <>
-      <AppHeader currentView={currentView} onNavigate={navigate} />
-      <main id="app" className="app-main">
-        {currentView === "dashboard" || currentView === "people" || currentView === "timeline" ? (
-          error ? (
-            <p role="alert">{error}</p>
-          ) : data ? (
-            currentView === "dashboard" ? (
-              <DashboardPage data={data} />
-            ) : currentView === "timeline" ? (
-              <TimelinePage events={data.timeline} />
-            ) : (
-              <PeopleLocationsPage
-                people={data.people}
-                // people={[]}
-                locations={data.locations}
-                // locations={[]}
-                evidence={data.evidence}
-                // evidence={[]}
-              />
-            )
+    <Routes>
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/dashboard" element={data ? <DashboardPage data={data} /> : pending} />
+      <Route path="/team" element={<Navigate to="/team/people" replace />} />
+      <Route
+        path="/team/people"
+        element={
+          data ? (
+            <PeopleLocationsPage
+              people={data.people}
+              locations={data.locations}
+              evidence={data.evidence}
+              tab="people"
+            />
           ) : (
-            <p role="status">Loading case file…</p>
+            pending
           )
-        ) : (
-          // StubPage means that the page is not implemented yet, but we still want to show the user that the page exists and is accessible
-          <StubPage key={currentView} view={currentView} />
-        )}
+        }
+      />
+      <Route
+        path="/team/locations"
+        element={
+          data ? (
+            <PeopleLocationsPage
+              people={data.people}
+              locations={data.locations}
+              evidence={data.evidence}
+              tab="locations"
+            />
+          ) : (
+            pending
+          )
+        }
+      />
+      <Route path="/timeline" element={data ? <TimelinePage events={data.timeline} /> : pending} />
+      <Route path="/evidence" element={<StubPage view="evidence" />} />
+      <Route path="/workspace" element={<StubPage view="workspace" />} />
+      {/* demo8: keep the old People link useful and make the unknown-route policy explicit. */}
+      <Route path="/people" element={<Navigate to="/team/people" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
+  );
+}
+
+export default function App() {
+  // The shell owns loaded data, so navigation does not reload the records.
+  const { data, error } = useCaseData();
+  return (
+    <>
+      <AppHeader />
+      <main id="app" className="app-main">
+        <AppRoutes data={data} error={error} />
       </main>
       <footer className="app-footer">
         <p>

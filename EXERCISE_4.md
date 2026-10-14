@@ -201,8 +201,9 @@ The classification describes the current responsibility, not the file name. Pres
 
 | Component | Class | Reason |
 |---|---|---|
-| `App` | Feature/container | Loads shared data through a hook and coordinates navigation and page states. |
-| `AppHeader` | Presentational | Shows navigation from props and calls the supplied navigation callback. |
+| `App` | Feature/container | Loads shared data through a hook and composes the shell and routes. |
+| `AppRoutes` | Feature/container (Demo 8) | Matches URLs to pages and defines redirects and loading/error content. |
+| `AppHeader` | Feature/container (after Demo 8) | Uses router-aware NavLink elements to coordinate navigation and active links. |
 | `StubPage` | Presentational | Shows a placeholder for the supplied view; does not navigate. |
 | `DashboardPage` | Feature/container | Derives case statistics and composes dashboard sections. |
 | `Badge` | Presentational | Shared by Dashboard and Timeline; shows a supplied label and typed visual tone. |
@@ -306,16 +307,43 @@ Run `npm run dev`; open `/react.html#dashboard` to show case and evidence badges
 
 **Tasks**
 
-- [ ] Install a routing library (React Router or an equivalent of your choice, justified) and
+- [x] Install a routing library (React Router or an equivalent of your choice, justified) and
 replace the shell's placeholder navigation from Exercise 3 with real routes for at least Dashboard, People & Locations, and Timeline.
-- [ ] Convert the People/Locations tab toggle from local component state into two real,
+- [x] Convert the People/Locations tab toggle from local component state into two real,
 navigable, bookmarkable routes (e.g. `/team/people` and `/team/locations`) instead of a click handler that only changes what's shown without changing the URL.
 
 **Questions** (depend on the tasks above)
 
-- [ ] Why does making the People/Locations tab a real route (versus keeping it as internal
+- [x] Why does making the People/Locations tab a real route (versus keeping it as internal
 component state) matter for the user? Name a concrete capability the user gains.
-- [ ] What does your router do when the URL doesn't match any route you've defined? Compare this to how the vanilla app's `handleHashChange()` fell back to the dashboard for an invalid hash.
+- [x] What does your router do when the URL doesn't match any route you've defined? Compare this to how the vanilla app's `handleHashChange()` fell back to the dashboard for an invalid hash.
+
+
+### Implementation and demonstration
+
+React Router is installed as a runtime dependency. I use its declarative `HashRouter`, `Routes`, `Route`, `NavLink`, and `Navigate`. Hash routing fits this project's static multi-page deployment: the server still receives `/react.html`, so refreshing a deep link needs no server rewrite rule. These are real client-side routes, with URLs, browser history, and anchor links. See [HashRouter](https://reactrouter.com/api/declarative-routers/HashRouter) and [navigation](https://reactrouter.com/start/declarative/navigating).
+
+- `react/main.tsx`: wraps the app in `HashRouter`.
+- `react/app/App.tsx`: explicit route table; application-wide data stays above the routes.
+- `react/app/AppHeader.tsx`: real `NavLink` navigation replaces button callbacks.
+- `react/features/people-locations/PeopleLocationsPage.tsx`: People and Locations tab links; each route supplies the tab prop. No local tab state.
+
+Run `npm run dev`; use the printed server address plus:
+
+| View | Bookmarkable URL |
+|---|---|
+| Dashboard | `/react.html#/dashboard` |
+| People | `/react.html#/team/people` |
+| Locations | `/react.html#/team/locations` |
+| Timeline | `/react.html#/timeline` |
+
+Click between the People and Locations tabs: only the chosen collection appears. Copy the Locations URL into a new tab, refresh, and use Back/Forward. The main People & Locations link stays active on both tab routes. `/` redirects to Dashboard; `/team` and legacy `/people` redirect to People. Any unmatched route, such as `/react.html#/unknown`, redirects to Dashboard with `replace`, so the invalid route is not kept as a Back destination. Evidence and Workspace still show placeholders.
+
+### Short answers
+
+**1. Why make the tab a route?** The URL remembers which tab is open. A user can bookmark or share the Locations link and open it directly, even after a refresh. Back and Forward also move between tabs. A local state toggle alone does not provide a separate address.
+
+**2. What happens for an unknown URL?** The wildcard route `*` renders `<Navigate to="/dashboard" replace />`. It sends the user to Dashboard and corrects the URL without keeping the invalid entry in history. The vanilla `handleHashChange()` also chose Dashboard for an invalid hash, but used its manual fallback logic; React Router now owns matching and navigation.
 
 ---
 
