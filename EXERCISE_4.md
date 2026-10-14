@@ -133,7 +133,7 @@ Run `npm run dev` and open `/react.html#people`. To demonstrate the other branch
 ### Implementation and how to demonstrate
 
 - `react/PeopleLocationsPage.tsx`: `people.map(...)` renders `PersonCard` with `key={person.id}`; `locations.map(...)` renders `LocationCard` with `key={location.id}`.
-- `react/TimelinePage.tsx`: a sorted copy of the events is mapped to `TimelineEventCard` with `key={event.id}`. The input array is not changed.
+- `react/TimelinePage.tsx` sorts a copy of the events. After Demo 5, `react/TimelineList.tsx` maps the prepared events to `TimelineEventCard` with `key={event.id}`. The input array is not changed.
 - `react/TimelineEventCard.tsx`: typed props describe one event; the card shows the time, title, description, certainty, and related IDs.
 - `react/App.tsx`: connects Timeline to the existing navigation and loaded data. Loading and error messages also apply to Timeline.
 
@@ -186,13 +186,61 @@ The checked items indicate implemented code and written answers. Rehearse the br
 
 **Tasks**
 
-- [ ] Classify every component you've built so far as either "presentational" or "feature/container". Explain why.
-- [ ] Find at least one component that's currently doing more than one job, and split it into two components with a clear boundary between them.
+- [x] Classify every component you've built so far as either "presentational" or "feature/container". Explain why.
+- [x] Find at least one component that's currently doing more than one job, and split it into two components with a clear boundary between them.
 
 **Questions** (depend on the tasks above)
 
-- [ ] For the component you split: what was the single responsibility of each half after the split? If an implementation detail in one half changed, would that change affect the other half? Why or why not?
-- [ ] Give one concrete rule you used to decide "this belongs in a presentational component" versus "this belongs in a feature component."
+- [x] For the component you split: what was the single responsibility of each half after the split? If an implementation detail in one half changed, would that change affect the other half? Why or why not?
+- [x] Give one concrete rule you used to decide "this belongs in a presentational component" versus "this belongs in a feature component."
+
+
+### Component classification
+
+The classification describes the current responsibility, not the file name. Presentational components may format values, choose CSS, and render conditions. Feature/container components coordinate data, domain selection, navigation, or stateful use cases.
+
+| Component | Class | Reason |
+|---|---|---|
+| `App` | Feature/container | Loads shared data through a hook and coordinates navigation and page states. |
+| `AppHeader` | Presentational | Shows navigation from props and calls the supplied navigation callback. |
+| `StubPage` | Presentational | Shows a placeholder for the supplied view; does not navigate. |
+| `DashboardPage` | Feature/container | Derives case statistics and composes dashboard sections. |
+| `Badge` | Presentational | Shows a supplied label and CSS class. |
+| `CaseSummary` | Presentational | Displays the supplied case record. |
+| `StatCard` | Presentational | Displays a supplied number and label. |
+| `ReviewProgress` | Presentational | Converts supplied counts to a visual percentage. |
+| `RecentEvidenceList` | Feature/container | Selects the five newest evidence records and renders the panel; it still has mixed responsibilities. |
+| `RecentTimelineList` | Feature/container | Selects the last five supplied events and renders the panel; it could also be split later. |
+| `PeopleLocationsPage` | Feature/container | Computes evidence counts per person and composes the two collections. |
+| `PersonCard` | Presentational | Displays a supplied person and evidence count. |
+| `LocationCard` | Presentational | Displays a supplied location. |
+| `Card` | Presentational | Provides an outer wrapper for children. |
+| `PersonStatement` | Presentational | Shows supplied text or nothing. |
+| `TimelinePage` | Feature/container | Prepares chronological event order and supplies it to the list. |
+| `TimelineList` | Presentational | Displays the supplied order or an empty message; no data selection or sorting. |
+| `TimelineEventCard` | Presentational | Formats one supplied event, including its certainty style. |
+| `KeyIdentityDemo` | Feature/container (teaching only) | Owns the key mode and resets the experiment. |
+| `Experiment` | Feature/container (teaching only) | Owns reversal and chooses the broken or fixed mapping. |
+| `NoteRow` | Feature/container (teaching only) | Owns editable note state to demonstrate row identity; it also renders the row. |
+| `WrongPropsExample` | Presentational (compile-only) | Passes deliberately wrong props to a card to demonstrate a type error. |
+
+`useCaseData` is a hook, not a component. Entry files mount component trees; `readView`, formatting helpers, and prop interfaces are not components.
+
+### Split and how to demonstrate
+
+Before this change, `TimelinePage` both decided event order and rendered the collection/empty state. Now:
+
+- `react/TimelinePage.tsx`, lines 10–24: prepares chronological data using a sorted copy and passes it to `TimelineList`.
+- `react/TimelineList.tsx`, lines 6–24: typed read-only array contract, empty state, mapping, and stable keys. It preserves the order provided by the caller.
+- `react/TimelineEventCard.tsx`, lines 20–37: displays one event. It is unchanged by the split.
+
+Search for `demo5` in the changed source files. Run `npm run dev` and open `/react.html#timeline`; the same events and styles remain visible. For an optional empty-state demonstration, temporarily pass `events={[]}` to `TimelinePage` in `App.tsx`, then restore `events={data.timeline}`.
+
+### Short answers
+
+**1. Responsibilities and change impact.** `TimelinePage` decides which order to use and prepares the data. `TimelineList` displays the supplied events or an empty message. Changing the sort direction changes what the user sees but does not require changing list code. Changing list layout does not require changing the page's sorting code. Both parts must change if their shared props contract changes. The boundary is `events: readonly TimelineEvent[]`.
+
+**2. Concrete rule.** If a component decides which records to use, owns a use case's state, or coordinates navigation, I call it feature/container. If it receives prepared data and focuses on displaying it, I call it presentational. For example, `TimelinePage` sorts events; `TimelineList` displays the given order. A click callback or a small display calculation alone does not make a component a feature.
 
 ---
 

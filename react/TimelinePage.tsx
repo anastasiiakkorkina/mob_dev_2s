@@ -1,14 +1,16 @@
 import type { TimelineEvent } from "../modules/state";
-import TimelineEventCard from "./TimelineEventCard";
+// demo5
+// The page prepares data; TimelineList owns the collection markup.
+import TimelineList from "./TimelineList";
 
 interface TimelinePageProps {
   events: TimelineEvent[];
 }
 
-// demo3
-// The page owns the collection; each card renders a single event.
+// demo5
+// Feature component: choose chronological order and pass the prepared events to the list.
 export default function TimelinePage({ events }: TimelinePageProps) {
-  // demo3
+  // demo5
   // Sort a copy so rendering never changes the input array.
   const chronologicalEvents = events
     .slice()
@@ -17,17 +19,9 @@ export default function TimelinePage({ events }: TimelinePageProps) {
   return (
     <section aria-labelledby="timeline-title">
       <h2 id="timeline-title">Timeline</h2>
-      {chronologicalEvents.length === 0 ? (
-        <p className="intro-card">No timeline events loaded yet.</p>
-      ) : (
-        <div className="timeline-container">
-          {/* demo3 */}
-          {/* A stable event ID identifies each sibling card, even after reordering. */}
-          {chronologicalEvents.map((event) => (
-            <TimelineEventCard key={event.id} event={event} />
-          ))}
-        </div>
-      )}
+      {/* demo5 */}
+      {/* The typed events prop is the boundary between preparation and presentation. */}
+      <TimelineList events={chronologicalEvents} />
     </section>
   );
 }
