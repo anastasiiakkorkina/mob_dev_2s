@@ -8,6 +8,7 @@ export default defineConfig({
       input: {
         vanilla: "index.html",
         react: "react.html",
+        demo4: "react/demo4.html",
       },
     },
   },

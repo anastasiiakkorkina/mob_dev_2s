@@ -151,13 +151,34 @@ Run `npm run dev`. Open `/react.html#people` to show people and locations, then 
 
 **Tasks**
 
-- [ ] Deliberately use `key={index}` in one throwaway example, then demonstrate (e.g. by reordering or filtering the underlying array) a case where it produces a visibly wrong result, before replacing it with a real stable id.
+- [x] Deliberately use `key={index}` in one throwaway example, then demonstrate (e.g. by reordering or filtering the underlying array) a case where it produces a visibly wrong result, before replacing it with a real stable id.
 
 **Questions** (depend on the tasks above)
 
-- [ ] What goes wrong, concretely, when keys are missing, duplicated, or based on array index for a list that can reorder or filter?
-- [ ] The *original* vanilla version of this app had a real bug where one feature used an array index as an identifier instead of a stable id. Would that same mistake, ported directly into React as `key={index}`, have caused a symptom a user could notice, or only a console warning? Explain why.
-- [ ] All of this app's real data (people, locations, timeline events) already has stable ids. Is there ever a legitimate reason to use `key={index}` anyway? When?
+- [x] What goes wrong, concretely, when keys are missing, duplicated, or based on array index for a list that can reorder or filter?
+- [x] The *original* vanilla version of this app had a real bug where one feature used an array index as an identifier instead of a stable id. Would that same mistake, ported directly into React as `key={index}`, have caused a symptom a user could notice, or only a console warning? Explain why.
+- [x] All of this app's real data (people, locations, timeline events) already has stable ids. Is there ever a legitimate reason to use `key={index}` anyway? When?
+
+
+### Implementation and live demonstration
+
+`react/KeyIdentityDemo.tsx` is an isolated throwaway example, marked with `demo4` comments. It deliberately uses `key={index}` first, then replaces that mapping with `key={person.id}` in the fixed mode. `NoteRow` has local note state so wrong identity is visible. The real portal lists still use stable IDs. This teaching page uses local state only to demonstrate the key bug; it is separate from the presentational views required by this exercise.
+
+1. Run `npm run dev`; open `/react/demo4.html` at the address printed by Vite.
+2. In "Broken: index keys", type `Signal note` next to Signal Scholar. Click **Reverse order**. The note now appears next to Nova Byte: state stayed at position zero.
+3. Click **Use stable IDs (reset experiment)**. This intentionally starts a fresh experiment, clearing notes and restoring the order. Enter `Signal note` again next to Signal Scholar.
+4. Click **Reverse order**. Signal moves to the bottom, but the note stays with Signal. Reversing repeatedly keeps the correct identity.
+5. Show the two `map()` branches in `KeyIdentityDemo.tsx`. The fixed branch uses the person ID. `Experiment key={mode}` resets the example when changing modes; it is not the fix for reordering. The fixed row key is `person.id`.
+
+The checked items indicate implemented code and written answers. Rehearse the browser demonstration before marking the Self-Check readiness table. Build/lint checks do not verify interactive browser behaviour.
+
+### Short answers
+
+**1. Missing, duplicate, or index keys.** Without explicit keys, React matches unkeyed list children by position and may warn for mapped arrays. Duplicate keys are ambiguous and cause a warning; items can be reused or rendered incorrectly. Index keys can move a row's local state or input value to the wrong record after sorting, insertion, deletion, or filtering. Index keys are valid-looking keys, so this can happen without a warning. Stable IDs keep identity tied to the record.
+
+**2. The vanilla index bug in React.** It could be visible, not just a warning: after reordering, a note, selection, or expanded row could belong to the wrong record. Our example moves Signal's note to Nova with index keys. A simple stateless text list may still look correct because React updates its text. Also, using an index to look up the wrong record is a separate data bug: changing only the React key does not fix that lookup. The inspected original `app.js` (commit `22cb2d8`) uses `entry.index` for `noteText-...` DOM IDs, but that alone does not prove a wrong-record bug; no more specific historical failure is claimed here.
+
+**3. When index keys are acceptable.** Only for a truly static list: no insertion, deletion, reordering, or filtering, and no row state or editable inputs whose identity matters. A short fixed list of decorative items is an example. For our people, locations, and events, stable IDs already exist, so I use them.
 
 ---
 
