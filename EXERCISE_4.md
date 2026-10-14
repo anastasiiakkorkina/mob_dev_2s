@@ -61,10 +61,10 @@ each with an explicitly typed props interface/type (no untyped or `any` props).
 
 Based on the course manuscript: Chapter 15, sections 15.3–15.6 (PDF pp. 104–106), and Chapter 16, sections 16.1–16.5 (PDF pp. 110–114).
 
-- `react/PersonCard.tsx`: typed `PersonCardProps` (`person: PersonRecord`, `evidenceCount: number`); displays a person and the related evidence count.
-- `react/LocationCard.tsx`: typed `LocationCardProps` (`location: LocationRecord`); displays a location and its equipment.
-- `react/Card.tsx`: typed `CardProps` (`className: string`, `children: ReactNode`); wraps the nested JSX in an `<article>`. Both cards use it.
-- `react/PeopleLocationsPage.tsx`: typed page props; composes both lists using the existing records and stable IDs as keys. `App.tsx` renders it for `#people`.
+- `react/features/people-locations/components/PersonCard.tsx`: typed `PersonCardProps` (`person: PersonRecord`, `evidenceCount: number`); displays a person and the related evidence count.
+- `react/features/people-locations/components/LocationCard.tsx`: typed `LocationCardProps` (`location: LocationRecord`); displays a location and its equipment.
+- `react/shared/components/Card.tsx`: typed `CardProps` (`className: string`, `children: ReactNode`); wraps the nested JSX in an `<article>`. Both cards use it.
+- `react/features/people-locations/PeopleLocationsPage.tsx`: typed page props; composes both lists using the existing records and stable IDs as keys. `App.tsx` renders it for `#people`.
 
 Run `npm run dev`, open `/react.html#people`, and show the two groups of cards. Both groups are visible together for Demo 1; tab routes and Timeline belong to later demos. These components do not change props, create DOM nodes manually, or add state.
 
@@ -74,7 +74,7 @@ The checked items above mean implemented/answered. The Self-Check readiness tabl
 
 **1. JSX expressions.** In `PersonCard`, `<h3>{person.name}</h3>` reads a JavaScript value. The expression `{evidenceCount === 1 ? "item" : "items"}` chooses a word. Braces accept expressions, such as variables, calculations, function calls, ternaries, and `map()`. Statements such as `if`, `for`, or variable declarations cannot go directly inside them. As visible children, React can render strings, numbers, elements, and arrays of renderable values; `null`, `undefined`, and booleans show nothing. A plain object cannot be rendered directly as a child (use a property instead). Objects can be valid attribute values, for example `style={{ color: "red" }}`.
 
-**2. Typed props and a real error.** `PersonCardProps` requires a complete `PersonRecord` and a numeric `evidenceCount`. TypeScript catches missing required fields, misspelled prop names, and incompatible values before the app runs. `react/demo1-props.typecheck.tsx` deliberately passes `evidenceCount="three"` to `PersonCard`. Remove its `@ts-expect-error` comment and run `npx tsc --noEmit`: the compiler reports `TS2322: Type 'string' is not assignable to type 'number'.` Restore the comment afterwards. The comment marks an expected error so the normal build still passes; the example is not imported into the running app. TypeScript does not validate fetched JSON at runtime automatically.
+**2. Typed props and a real error.** `PersonCardProps` requires a complete `PersonRecord` and a numeric `evidenceCount`. TypeScript catches missing required fields, misspelled prop names, and incompatible values before the app runs. `react/demos/demo1-props.typecheck.tsx` deliberately passes `evidenceCount="three"` to `PersonCard`. Remove its `@ts-expect-error` comment and run `npx tsc --noEmit`: the compiler reports `TS2322: Type 'string' is not assignable to type 'number'.` Restore the comment afterwards. The comment marks an expected error so the normal build still passes; the example is not imported into the running app. TypeScript does not validate fetched JSON at runtime automatically.
 
 **3. Named props vs. children.** Named props supply specific inputs: `person={person}` tells `PersonCard` which record to display. Nested JSX between `<Card>` and `</Card>` becomes its `children` prop. I chose children because `Card` provides the same outer structure for different content. It does not need to know the fields of a person or a location.
 
@@ -132,10 +132,10 @@ Run `npm run dev` and open `/react.html#people`. To demonstrate the other branch
 
 ### Implementation and how to demonstrate
 
-- `react/PeopleLocationsPage.tsx`: `people.map(...)` renders `PersonCard` with `key={person.id}`; `locations.map(...)` renders `LocationCard` with `key={location.id}`.
-- `react/TimelinePage.tsx` sorts a copy of the events. After Demo 5, `react/TimelineList.tsx` maps the prepared events to `TimelineEventCard` with `key={event.id}`. The input array is not changed.
-- `react/TimelineEventCard.tsx`: typed props describe one event; the card shows the time, title, description, certainty, and related IDs.
-- `react/App.tsx`: connects Timeline to the existing navigation and loaded data. Loading and error messages also apply to Timeline.
+- `react/features/people-locations/PeopleLocationsPage.tsx`: `people.map(...)` renders `PersonCard` with `key={person.id}`; `locations.map(...)` renders `LocationCard` with `key={location.id}`.
+- `react/features/timeline/TimelinePage.tsx` sorts a copy of the events. After Demo 5, `react/features/timeline/components/TimelineList.tsx` maps the prepared events to `TimelineEventCard` with `key={event.id}`. The input array is not changed.
+- `react/features/timeline/components/TimelineEventCard.tsx`: typed props describe one event; the card shows the time, title, description, certainty, and related IDs.
+- `react/app/App.tsx`: connects Timeline to the existing navigation and loaded data. Loading and error messages also apply to Timeline.
 
 Search for `demo3` in the React files to find the new collection code and short English comments. Inside JSX, comments use `{/* ... */}`; in JavaScript they use `// ...`.
 
@@ -162,7 +162,7 @@ Run `npm run dev`. Open `/react.html#people` to show people and locations, then 
 
 ### Implementation and live demonstration
 
-`react/KeyIdentityDemo.tsx` is an isolated throwaway example, marked with `demo4` comments. It deliberately uses `key={index}` first, then replaces that mapping with `key={person.id}` in the fixed mode. `NoteRow` has local note state so wrong identity is visible. The real portal lists still use stable IDs. This teaching page uses local state only to demonstrate the key bug; it is separate from the presentational views required by this exercise.
+`react/demos/KeyIdentityDemo.tsx` is an isolated throwaway example, marked with `demo4` comments. It deliberately uses `key={index}` first, then replaces that mapping with `key={person.id}` in the fixed mode. `NoteRow` has local note state so wrong identity is visible. The real portal lists still use stable IDs. This teaching page uses local state only to demonstrate the key bug; it is separate from the presentational views required by this exercise.
 
 1. Run `npm run dev`; open `/react/demo4.html` at the address printed by Vite.
 2. In "Broken: index keys", type `Signal note` next to Signal Scholar. Click **Reverse order**. The note now appears next to Nova Byte: state stayed at position zero.
@@ -230,9 +230,9 @@ The classification describes the current responsibility, not the file name. Pres
 
 Before this change, `TimelinePage` both decided event order and rendered the collection/empty state. Now:
 
-- `react/TimelinePage.tsx`, lines 10–24: prepares chronological data using a sorted copy and passes it to `TimelineList`.
-- `react/TimelineList.tsx`, lines 6–24: typed read-only array contract, empty state, mapping, and stable keys. It preserves the order provided by the caller.
-- `react/TimelineEventCard.tsx`, lines 20–37: displays one event. It is unchanged by the split.
+- `react/features/timeline/TimelinePage.tsx`, lines 10–24: prepares chronological data using a sorted copy and passes it to `TimelineList`.
+- `react/features/timeline/components/TimelineList.tsx`, lines 6–24: typed read-only array contract, empty state, mapping, and stable keys. It preserves the order provided by the caller.
+- `react/features/timeline/components/TimelineEventCard.tsx`, lines 20–37: displays one event. It is unchanged by the split.
 
 Search for `demo5` in the changed source files. Run `npm run dev` and open `/react.html#timeline`; the same events and styles remain visible. For an optional empty-state demonstration, temporarily pass `events={[]}` to `TimelinePage` in `App.tsx`, then restore `events={data.timeline}`.
 
@@ -248,15 +248,26 @@ Search for `demo5` in the changed source files. Run `npm run dev` and open `/rea
 
 **Tasks**
 
-- [ ] Reorganize your React source into a feature-oriented structure (e.g. grouping by
+- [x] Reorganize your React source into a feature-oriented structure (e.g. grouping by
 `people-locations/`, `timeline/`, `dashboard/`, shared `components/`, rather than one flat
 folder of files). Including the Dashboard and shell from Exercise 3.
-- [ ] Document the structure you landed on (a short `ARCHITECTURE.md` section or README snippet is enough) and the rule you used to decide what's "shared" versus "feature-local."
+- [x] Document the structure you landed on (a short `ARCHITECTURE.md` section or README snippet is enough) and the rule you used to decide what's "shared" versus "feature-local."
 
 **Questions** (depend on the tasks above)
 
-- [ ] What's the difference between organizing files "by type" (all components in one folder, all hooks in another) and "by feature"? What made you choose the structure you chose for this app specifically?
-- [ ] Where did you draw the line between a component that lives inside one feature folder and one that belongs in a shared/common folder? Give one real example of each from your own structure.
+- [x] What's the difference between organizing files "by type" (all components in one folder, all hooks in another) and "by feature"? What made you choose the structure you chose for this app specifically?
+- [x] Where did you draw the line between a component that lives inside one feature folder and one that belongs in a shared/common folder? Give one real example of each from your own structure.
+
+
+### Implementation
+
+See `ARCHITECTURE.md` for the complete tree and placement rules. React source now uses `app/`, `features/dashboard/`, `features/people-locations/`, `features/timeline/`, `shared/components/`, and `demos/`. Entry URLs are unchanged. Imports and the earlier demo file references in this document have been updated.
+
+### Short answers
+
+**1. By type vs. by feature.** By type puts all components in one folder and all hooks in another. By feature keeps files for the same user task together. I chose features because our Dashboard, People & Locations, and Timeline are distinct views. I can find a page and its local components in one place. App-wide loading and navigation stay in `app/`.
+
+**2. Feature-local vs. shared.** I keep domain-specific components inside their feature. For example, `features/timeline/components/TimelineEventCard.tsx` knows about event time and certainty. I use shared for generic contracts with real reuse: `shared/components/Card.tsx` wraps children and is already used by both PersonCard and LocationCard. Those callers are currently in one feature, but Card itself has no domain-specific data. Being presentational alone does not make a component shared.
 
 ---
 

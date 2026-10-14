@@ -1,7 +1,7 @@
-import type { TimelineEvent } from "../modules/state";
+import type { TimelineEvent } from "../../../modules/state";
 // demo5
 // The page prepares data; TimelineList owns the collection markup.
-import TimelineList from "./TimelineList";
+import TimelineList from "./components/TimelineList";
 
 interface TimelinePageProps {
   events: TimelineEvent[];

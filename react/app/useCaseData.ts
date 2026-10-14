@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { STORAGE_KEY_BOOKMARKS } from "../modules/state";
+import { STORAGE_KEY_BOOKMARKS } from "../../modules/state";
 import type {
   CaseRecord,
   EvidenceRecord,
   PersonRecord,
   LocationRecord,
   TimelineEvent,
-} from "../modules/state";
+} from "../../modules/state";
 
 export interface CaseData {
   caseData: CaseRecord;

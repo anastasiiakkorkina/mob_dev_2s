@@ -1,5 +1,5 @@
-import type { LocationRecord } from "../modules/state";
-import Card from "./Card";
+import type { LocationRecord } from "../../../../modules/state";
+import Card from "../../../shared/components/Card";
 
 interface LocationCardProps {
   location: LocationRecord;

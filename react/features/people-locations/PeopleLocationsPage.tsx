@@ -1,7 +1,7 @@
-import { evidenceMentionsPerson } from "../modules/lookup_helpers";
-import type { EvidenceRecord, LocationRecord, PersonRecord } from "../modules/state";
-import LocationCard from "./LocationCard";
-import PersonCard from "./PersonCard";
+import { evidenceMentionsPerson } from "../../../modules/lookup_helpers";
+import type { EvidenceRecord, LocationRecord, PersonRecord } from "../../../modules/state";
+import LocationCard from "./components/LocationCard";
+import PersonCard from "./components/PersonCard";
 
 interface PeopleLocationsPageProps {
   people: PersonRecord[];

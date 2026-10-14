@@ -1,6 +1,6 @@
-import type { CaseRecord, EvidenceRecord, TimelineEvent } from "../modules/state";
-import { formatDate, getStatusBadgeClass } from "../modules/lookup_helpers";
-import type { CaseData } from "./useCaseData";
+import type { CaseRecord, EvidenceRecord, TimelineEvent } from "../../../modules/state";
+import { formatDate, getStatusBadgeClass } from "../../../modules/lookup_helpers";
+import type { CaseData } from "../../app/useCaseData";
 
 function Badge({ label, className }: { label: string; className: string }) {
   return <span className={`badge ${className}`}>{label}</span>;

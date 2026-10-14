@@ -1,5 +1,5 @@
-import type { TimelineEvent } from "../modules/state";
-import { formatDate } from "../modules/lookup_helpers";
+import type { TimelineEvent } from "../../../../modules/state";
+import { formatDate } from "../../../../modules/lookup_helpers";
 
 interface TimelineEventCardProps {
   event: TimelineEvent;

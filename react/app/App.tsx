@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import AppHeader from "./AppHeader";
-import { StubPage } from "./pages";
-import DashboardPage from "./DashboardPage";
-import PeopleLocationsPage from "./PeopleLocationsPage";
+import { StubPage } from "./StubPage";
+import DashboardPage from "../features/dashboard/DashboardPage";
+import PeopleLocationsPage from "../features/people-locations/PeopleLocationsPage";
 // demo3
 // Timeline now renders the loaded event collection in React.
-import TimelinePage from "./TimelinePage";
+import TimelinePage from "../features/timeline/TimelinePage";
 import { useCaseData } from "./useCaseData";
 import { readView, type View } from "./routing";
 

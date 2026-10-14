@@ -1,6 +1,6 @@
 // demo5
 // Presentational component: display the supplied order, without choosing or sorting data.
-import type { TimelineEvent } from "../modules/state";
+import type { TimelineEvent } from "../../../../modules/state";
 import TimelineEventCard from "./TimelineEventCard";
 
 interface TimelineListProps {

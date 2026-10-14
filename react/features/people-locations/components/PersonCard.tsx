@@ -1,5 +1,5 @@
-import type { PersonRecord } from "../modules/state";
-import Card from "./Card";
+import type { PersonRecord } from "../../../../modules/state";
+import Card from "../../../shared/components/Card";
 import PersonStatement from "./PersonStatement";
 
 interface PersonCardProps {

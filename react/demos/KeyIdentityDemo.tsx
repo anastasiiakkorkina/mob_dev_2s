@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { PersonRecord } from "../modules/state";
+import type { PersonRecord } from "../../modules/state";
 
 type DemoPerson = Pick<PersonRecord, "id" | "name">;
 type KeyMode = "index" | "id";
