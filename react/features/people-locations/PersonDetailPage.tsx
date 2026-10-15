@@ -33,6 +33,10 @@ export default function PersonDetailPage({ people, evidence }: PersonDetailPageP
       <PersonCard person={person} evidenceCount={evidenceCount} />
       <h3>Background</h3>
       <p>{person.background}</p>
+      {/* demo10: a bookmarkable link supplies the Timeline's initial filter. */}
+      <Link to={`/timeline?person=${encodeURIComponent(person.id)}`}>
+        View timeline events for {person.name}
+      </Link>
     </section>
   );
 }

@@ -60,7 +60,11 @@ export function AppRoutes({ data, error }: AppRoutesProps) {
           )
         }
       />
-      <Route path="/timeline" element={data ? <TimelinePage events={data.timeline} /> : pending} />
+      {/* demo10: pass people for validating and displaying URL filter values. */}
+      <Route
+        path="/timeline"
+        element={data ? <TimelinePage events={data.timeline} people={data.people} /> : pending}
+      />
       <Route path="/evidence" element={<StubPage view="evidence" />} />
       <Route path="/workspace" element={<StubPage view="workspace" />} />
       {/* demo8: keep the old People link useful and make the unknown-route policy explicit. */}

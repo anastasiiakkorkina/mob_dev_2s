@@ -64,3 +64,8 @@ The portal uses React Router's `HashRouter` because `react.html` is a separate e
 ## Demo 9: person details
 
 `/team/people/:personId` identifies one record. `PersonDetailPage` reads `useParams`, validates against the loaded people collection, and supplies the real record to `PersonCard`. Unknown IDs show a local not-found message, while unknown route shapes still use the global Dashboard redirect. Person cards link to detail URLs using stable IDs; no query filter or new state is added.
+
+
+## Demo 10: Timeline query state
+
+`/react.html#/timeline?person=nova-byte` filters Timeline from the URL. TimelinePage validates the person, derives the matching events, and shows a disabled selection preview without local filter state. PersonDetailPage supplies real links. Empty or absent parameters show all events; unknown IDs show an explicit message and an empty list. Dashboard, People/Locations, and Timeline use React rendering throughout; vanilla renderer modules are not called from the React feature tree.

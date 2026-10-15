@@ -383,13 +383,31 @@ Search for `demo9` to find the changes. Run `npm run dev`, open `/react.html#/te
 
 **Tasks**
 
-- [ ] On the Timeline view, read a query parameter (e.g. `?person=...`) when the page loads, and use it to determine the *initial* rendered list (for example, pre-selecting a person filter if the app is opened via a link that includes one). Remember, the filter controls themselves don't need to be interactive yet. This is about parameterizing the initial render from the URL, not wiring `onChange`.
-- [ ] Do a final pass confirming: Dashboard, People & Locations, and Timeline are fully React, none of them use `innerHTML` or manual DOM creation anywhere, and all three are reachable via real, bookmarkable routes.
+- [x] On the Timeline view, read a query parameter (e.g. `?person=...`) when the page loads, and use it to determine the *initial* rendered list (for example, pre-selecting a person filter if the app is opened via a link that includes one). Remember, the filter controls themselves don't need to be interactive yet. This is about parameterizing the initial render from the URL, not wiring `onChange`.
+- [x] Do a final pass confirming: Dashboard, People & Locations, and Timeline are fully React, none of them use `innerHTML` or manual DOM creation anywhere, and all three are reachable via real, bookmarkable routes.
 
 **Questions** (depend on the tasks above)
 
-- [ ] Why is reading a query parameter once, on initial render, still consistent with this exercise's "no state beyond what's necessary to render the initial view" rule? What would cross the line into "real interactivity" that's out of scope until Exercise 5?
-- [ ] What would you need to add to make Timeline's filters *actually* filter the list when a user changes them? (You don't have to build it. Just name the concept you'd need)
-- [ ] Across the 3 views you've now fully migrated, what's one piece of duplicated logic or markup you noticed but didn't extract yet? Why didn't you, and would you if you had more time?
+- [x] Why is reading a query parameter once, on initial render, still consistent with this exercise's "no state beyond what's necessary to render the initial view" rule? What would cross the line into "real interactivity" that's out of scope until Exercise 5?
+- [x] What would you need to add to make Timeline's filters *actually* filter the list when a user changes them? (You don't have to build it. Just name the concept you'd need)
+- [x] Across the 3 views you've now fully migrated, what's one piece of duplicated logic or markup you noticed but didn't extract yet? Why didn't you, and would you if you had more time?
+
+### Implementation and demonstration
+
+`TimelinePage` reads `person` with `useSearchParams`, validates it against the people records, filters a copy of the event collection, and sorts it. No local filter state, setter, or `onChange` is added. The disabled person select displays the value from the URL. The URL stays the source of truth on later route navigation too; it is not copied into separate component state. `TimelineList` accepts an optional empty message. Person details link to the filtered Timeline.
+
+Run `npm run dev` and open `/react.html#/timeline?person=nova-byte`. The query must be after the hash because the app uses HashRouter. This shows Nova's events and selects Nova in the disabled control. `/react.html#/timeline` shows all events; `?person=` also means all people. `?person=not-a-person` shows an unknown-person message and no events. Open a person's detail page and use its Timeline link to demonstrate navigation without editing the URL.
+
+### Migration check
+
+Dashboard (`/react.html#/dashboard`), People (`/react.html#/team/people`), Locations (`/react.html#/team/locations`), and Timeline (`/react.html#/timeline`) are rendered by React and have bookmarkable routes. Their React feature components and shared UI use no `innerHTML`, `document.createElement`, or manual DOM insertion. Shared imports from `modules/state.ts` and pure `modules/lookup_helpers.ts` supply types/data and calculations; the React views do not call the vanilla renderers. The separate vanilla portal remains available. Evidence and Workspace remain out of scope.
+
+### Short answers
+
+**1. Why is this allowed?** The query only determines which records are shown when the route opens. I derive the view from the URL without adding editable filter state. Adding dropdown `onChange` handlers that update state or URL and change results would add real filter interaction, which belongs to Exercise 5. See [useSearchParams](https://reactrouter.com/api/hooks/useSearchParams).
+
+**2. What would interactive filters need?** Controlled inputs, `onChange` handlers, and React state such as `useState`, or URL updates with `setSearchParams`. The visible list would then be derived from the current filter values.
+
+**3. Remaining duplication.** PeopleLocationsPage and PersonDetailPage both count evidence with `evidence.filter(...).length`. I kept this small calculation local because it is simple and only has two callers. If it grows or appears again, I would extract a pure `countEvidenceForPerson` helper and reuse it.
 
 ---

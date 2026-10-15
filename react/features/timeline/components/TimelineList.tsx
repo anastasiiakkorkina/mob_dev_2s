@@ -5,11 +5,16 @@ import TimelineEventCard from "./TimelineEventCard";
 
 interface TimelineListProps {
   events: readonly TimelineEvent[];
+  // demo10: the feature supplies context-specific empty text; the list stays presentational.
+  emptyMessage?: string;
 }
 
-export default function TimelineList({ events }: TimelineListProps) {
+export default function TimelineList({
+  events,
+  emptyMessage = "No timeline events loaded yet.",
+}: TimelineListProps) {
   if (events.length === 0) {
-    return <p className="intro-card">No timeline events loaded yet.</p>;
+    return <p className="intro-card">{emptyMessage}</p>;
   }
 
   return (
