@@ -1,4 +1,6 @@
 import type { PersonRecord } from "../../../../modules/state";
+// demo9: real links support direct opening, bookmarking, and browser history.
+import { Link } from "react-router";
 import Card from "../../../shared/components/Card";
 import PersonStatement from "./PersonStatement";
 
@@ -37,6 +39,10 @@ export default function PersonCard({ person, evidenceCount }: PersonCardProps) {
           ? "No related evidence yet."
           : `${evidenceCount} related evidence ${evidenceCount === 1 ? "item" : "items"}`}
       </p>
+      {/* demo9: link to this record's parameterized route using its stable ID. */}
+      <Link to={`/team/people/${encodeURIComponent(person.id)}`}>
+        View details for {person.name}
+      </Link>
     </Card>
   );
 }

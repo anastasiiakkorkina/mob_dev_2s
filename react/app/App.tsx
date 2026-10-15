@@ -3,6 +3,8 @@ import AppHeader from "./AppHeader";
 import { StubPage } from "./StubPage";
 import DashboardPage from "../features/dashboard/DashboardPage";
 import PeopleLocationsPage from "../features/people-locations/PeopleLocationsPage";
+// demo9: a dynamic path identifies one person record.
+import PersonDetailPage from "../features/people-locations/PersonDetailPage";
 import TimelinePage from "../features/timeline/TimelinePage";
 import { useCaseData, type CaseData } from "./useCaseData";
 
@@ -21,6 +23,13 @@ export function AppRoutes({ data, error }: AppRoutesProps) {
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/dashboard" element={data ? <DashboardPage data={data} /> : pending} />
       <Route path="/team" element={<Navigate to="/team/people" replace />} />
+      {/* demo9: the matched personId is read and checked inside PersonDetailPage. */}
+      <Route
+        path="/team/people/:personId"
+        element={
+          data ? <PersonDetailPage people={data.people} evidence={data.evidence} /> : pending
+        }
+      />
       <Route
         path="/team/people"
         element={

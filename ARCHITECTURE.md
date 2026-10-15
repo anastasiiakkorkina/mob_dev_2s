@@ -17,6 +17,7 @@ react/
       DashboardPage.tsx            # Dashboard and its local components
     people-locations/
       PeopleLocationsPage.tsx
+      PersonDetailPage.tsx          # Validated person route (Demo 9)
       components/
         PersonCard.tsx
         LocationCard.tsx
@@ -58,3 +59,8 @@ Folder location and component responsibility are separate decisions. `TimelinePa
 ## Demo 8: routes and deployment
 
 The portal uses React Router's `HashRouter` because `react.html` is a separate entry on a static host. Routes are `/dashboard`, `/team/people`, `/team/locations`, and `/timeline` inside the URL hash. `AppRoutes` selects pages, while `App` keeps loaded records above navigation. `NavLink` derives active navigation and tab styles from the URL. Unknown routes redirect to `/dashboard` with replacement. Evidence and Workspace remain placeholders. No server fallback rewrite is needed for hash URLs.
+
+
+## Demo 9: person details
+
+`/team/people/:personId` identifies one record. `PersonDetailPage` reads `useParams`, validates against the loaded people collection, and supplies the real record to `PersonCard`. Unknown IDs show a local not-found message, while unknown route shapes still use the global Dashboard redirect. Person cards link to detail URLs using stable IDs; no query filter or new state is added.

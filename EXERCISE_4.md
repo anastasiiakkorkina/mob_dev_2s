@@ -212,6 +212,7 @@ The classification describes the current responsibility, not the file name. Pres
 | `ReviewProgress` | Presentational | Converts supplied counts to a visual percentage. |
 | `RecentEvidenceList` | Feature/container | Selects the five newest evidence records and renders the panel; it still has mixed responsibilities. |
 | `RecentTimelineList` | Feature/container | Selects the last five supplied events and renders the panel; it could also be split later. |
+| `PersonDetailPage` | Feature/container (Demo 9) | Reads the route parameter, validates the person, and prepares the detail view. |
 | `PeopleLocationsPage` | Feature/container | Computes evidence counts per person and composes the two collections. |
 | `PersonCard` | Presentational | Displays a supplied person and evidence count. |
 | `LocationCard` | Presentational | Displays a supplied location. |
@@ -351,15 +352,30 @@ Click between the People and Locations tabs: only the chosen collection appears.
 
 **Tasks**
 
-- [ ] Add at least one route that takes a parameter (e.g. a person or location id in the URL, such as `/team/people/:personId`), and use that parameter inside the corresponding component to determine what to render.
-- [ ] Make at least one place in the app link to that parameterized route (not just typing the URL by hand). For example, a person's name in a related-evidence context, or a "view on team page" link.
+- [x] Add at least one route that takes a parameter (e.g. a person or location id in the URL, such as `/team/people/:personId`), and use that parameter inside the corresponding component to determine what to render.
+- [x] Make at least one place in the app link to that parameterized route (not just typing the URL by hand). For example, a person's name in a related-evidence context, or a "view on team page" link.
 
 **Questions** (depend on the tasks above)
 
-- [ ] How do you read a route parameter's value inside your component, and what type is it as far as TypeScript is concerned by default? What did you have to do to use it safely (e.g. what if the id in the URL doesn't match any real person)?
-- [ ] What's the practical difference, for the user, between `/team/people/nova-byte` (a route
+- [x] How do you read a route parameter's value inside your component, and what type is it as far as TypeScript is concerned by default? What did you have to do to use it safely (e.g. what if the id in the URL doesn't match any real person)?
+- [x] What's the practical difference, for the user, between `/team/people/nova-byte` (a route
 param) and `/team/people?person=nova-byte` (a query param)? Why is one more appropriate than
 the other for this specific case?
+
+
+### Implementation and demonstration
+
+- `react/app/App.tsx`: route `/team/people/:personId`, with shared loading and error handling.
+- `react/features/people-locations/PersonDetailPage.tsx`: reads `personId`, finds the record, and displays its card and background. Missing or unknown IDs show "Person not found" and a Back to people link.
+- `react/features/people-locations/components/PersonCard.tsx`: a real "View details for …" link builds the parameterized URL from the stable person ID.
+
+Search for `demo9` to find the changes. Run `npm run dev`, open `/react.html#/team/people`, and click Nova Byte's details link. The URL becomes `/react.html#/team/people/nova-byte`. Copy it into a new tab or refresh to open the same person directly. Open `/react.html#/team/people/not-a-person` to show the not-found message; click Back to people to recover. A missing path segment `/team/people` is the normal list route.
+
+### Short answers
+
+**1. Reading and checking a parameter.** I use `const { personId } = useParams<"personId">()`. Its type is `string | undefined`, not our `PersonId` type. I compare it with real IDs using `people.find(...)`. If no record matches, I show "Person not found" and a back link. I do not use `any`, a forced cast, or a non-null assertion. See [useParams](https://reactrouter.com/api/hooks/useParams).
+
+**2. Route parameter vs. query parameter.** `/team/people/nova-byte` identifies Nova's own detail page. `/team/people?person=nova-byte` keeps the people collection route and could optionally filter or select Nova. A path parameter fits here because the page represents one person. This demo implements the detail route; it does not add a people query filter.
 
 ---
 
