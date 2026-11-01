@@ -100,9 +100,15 @@ function RecentTimelineList({ timeline }: { timeline: TimelineEvent[] }) {
   );
 }
 
-export default function DashboardPage({ data }: { data: CaseData }) {
-  // Read the current shared bookmark list instead of keeping a second count in state.
-  const bookmarkCount = data.bookmarks.length;
+export default function DashboardPage({
+  data,
+  bookmarks,
+}: {
+  data: CaseData;
+  bookmarks: string[];
+}) {
+  // Derive the count from App's shared bookmark state instead of storing another copy.
+  const bookmarkCount = bookmarks.length;
   const reviewedCount = data.evidence.filter(
     (item) => (item.status || "").toLowerCase() === "reviewed",
   ).length;

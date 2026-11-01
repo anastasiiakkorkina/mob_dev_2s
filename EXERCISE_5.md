@@ -109,7 +109,7 @@ These checkboxes are for self-checking. Don't forget to do the actual checking o
 
 - [x] The vanilla app had two related bugs here: a dashboard bookmark count that could go stale (because it only re-rendered on a view's first visit), and a `filteredEvidence` variable that was sometimes literally the _same array reference_ as the master list. Explain, concretely, why deriving these values during render instead of storing them makes **both** of those bug classes structurally impossible, not just less likely.
 
-  **ANSWER:** The Dashboard count reads `data.bookmarks.length`, and Workspace filters evidence with the same `data.bookmarks` IDs. A bookmark update changes that one shared state, so React renders both values from the latest list. The filtered list is also calculated from the full evidence list on each render; it is never assigned back to the master list or kept as stored state that can become stale. Sorting runs on a copied filtered array, so the original evidence order stays unchanged.
+  **ANSWER:** The Dashboard count reads the shared `bookmarks.length`, and Workspace filters evidence with those same bookmark IDs. A bookmark update changes that one shared state, so React renders both values from the latest list. The filtered list is also calculated from the full evidence list on each render; it is never assigned back to the master list or kept as stored state that can become stale. Sorting runs on a copied filtered array, so the original evidence order stays unchanged.
 
 ---
 
@@ -117,14 +117,19 @@ These checkboxes are for self-checking. Don't forget to do the actual checking o
 
 **Tasks**
 
-- [ ] Identify the lowest common ancestor component of everywhere bookmark state needs to be read or changed (at minimum: an Evidence card's bookmark button, the Dashboard's bookmark count, and the Workspace's bookmarked-items list), and move the actual `useState` for bookmarks up to live there.
-- [ ] Confirm that toggling a bookmark from the Evidence view is immediately reflected on the
+- [x] Identify the lowest common ancestor component of everywhere bookmark state needs to be read or changed (at minimum: an Evidence card's bookmark button, the Dashboard's bookmark count, and the Workspace's bookmarked-items list), and move the actual `useState` for bookmarks up to live there.
+- [x] Confirm that toggling a bookmark from the Evidence view is immediately reflected on the
       Dashboard the next time it's rendered.
 
 **Questions** (depend on the tasks above)
 
-- [ ] What does "lifting state up" actually mean, mechanically? Walk through where the bookmark state lived before you lifted it, and where it lives now.
-- [ ] What would go wrong (be specific) if you had instead kept a separate `useState` for bookmarks inside each of the Dashboard, Evidence, and Workspace components?
+- [x] What does "lifting state up" actually mean, mechanically? Walk through where the bookmark state lived before you lifted it, and where it lives now.
+
+  **ANSWER:** Lifting state up means moving `useState` to the nearest parent shared by all components that need it. The bookmark list was part of the loaded case data in `useCaseData`. Now `App` owns `useState` for bookmarks and passes the list and toggle callback to the pages. Evidence calls the callback; Dashboard and Workspace read the same list.
+
+- [x] What would go wrong (be specific) if you had instead kept a separate `useState` for bookmarks inside each of the Dashboard, Evidence, and Workspace components?
+
+  **ANSWER:** Each page would have a separate list. Toggling a bookmark in Evidence would not update the Dashboard count or Workspace list. The counts and lists could disagree unless every copy was updated and kept in sync.
 
 ---
 

@@ -14,6 +14,7 @@ import { STORAGE_KEY_BOOKMARKS, STORAGE_KEY_NOTES } from "../../modules/state";
 interface AppRoutesProps {
   data: CaseData | null;
   error: string;
+  bookmarks: string[];
   notes: Record<string, string>;
   onToggleBookmark: (id: string) => void;
   onSaveNote: (id: string, text: string) => void;
@@ -21,13 +22,23 @@ interface AppRoutesProps {
 
 // demo8
 // Explicit routes replace manual hash listeners and currentView state.
-export function AppRoutes({ data, error, notes, onToggleBookmark, onSaveNote }: AppRoutesProps) {
+export function AppRoutes({
+  data,
+  error,
+  bookmarks,
+  notes,
+  onToggleBookmark,
+  onSaveNote,
+}: AppRoutesProps) {
   const pending = error ? <p role="alert">{error}</p> : <p role="status">Loading case file…</p>;
 
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="/dashboard" element={data ? <DashboardPage data={data} /> : pending} />
+      <Route
+        path="/dashboard"
+        element={data ? <DashboardPage data={data} bookmarks={bookmarks} /> : pending}
+      />
       <Route path="/team" element={<Navigate to="/team/people" replace />} />
       {/* demo9: the matched personId is read and checked inside PersonDetailPage. */}
       <Route
@@ -79,7 +90,7 @@ export function AppRoutes({ data, error, notes, onToggleBookmark, onSaveNote }: 
               evidence={data.evidence}
               people={data.people}
               locations={data.locations}
-              bookmarks={data.bookmarks}
+              bookmarks={bookmarks}
               onToggleBookmark={onToggleBookmark}
             />
           ) : (
@@ -94,7 +105,7 @@ export function AppRoutes({ data, error, notes, onToggleBookmark, onSaveNote }: 
             <WorkspacePage
               evidence={data.evidence}
               people={data.people}
-              bookmarks={data.bookmarks}
+              bookmarks={bookmarks}
               notes={notes}
               onSaveNote={onSaveNote}
             />
@@ -112,7 +123,16 @@ export function AppRoutes({ data, error, notes, onToggleBookmark, onSaveNote }: 
 
 export default function App() {
   // The shell owns loaded data, so navigation does not reload the records.
-  const { data, error, setData } = useCaseData();
+  const { data, error } = useCaseData();
+  // App is the lowest common owner of bookmark readers and the Evidence toggle action.
+  const [bookmarks, setBookmarks] = useState<string[]>(() => {
+    try {
+      const saved: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY_BOOKMARKS) ?? "[]");
+      return Array.isArray(saved) ? saved.filter((id): id is string => typeof id === "string") : [];
+    } catch {
+      return [];
+    }
+  });
   const [notes, setNotes] = useState<Record<string, string>>(() => {
     try {
       const value: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY_NOTES) ?? "{}");
@@ -126,14 +146,12 @@ export default function App() {
 
   // Pass this callback to the pages that can change the shared bookmark list.
   function toggleBookmark(id: string) {
-    if (!data) return;
-    // Make a new array and data object so the previous React state stays untouched.
-    const bookmarks = data.bookmarks.includes(id)
-      ? data.bookmarks.filter((item) => item !== id)
-      : [...data.bookmarks, id];
-    const nextData = { ...data, bookmarks };
-    setData(nextData);
-    localStorage.setItem(STORAGE_KEY_BOOKMARKS, JSON.stringify(bookmarks));
+    // Make a new bookmark array so the previous state stays untouched.
+    const nextBookmarks = bookmarks.includes(id)
+      ? bookmarks.filter((item) => item !== id)
+      : [...bookmarks, id];
+    setBookmarks(nextBookmarks);
+    localStorage.setItem(STORAGE_KEY_BOOKMARKS, JSON.stringify(nextBookmarks));
   }
 
   function saveNote(id: string, text: string) {
@@ -149,6 +167,7 @@ export default function App() {
         <AppRoutes
           data={data}
           error={error}
+          bookmarks={bookmarks}
           notes={notes}
           onToggleBookmark={toggleBookmark}
           onSaveNote={saveNote}
