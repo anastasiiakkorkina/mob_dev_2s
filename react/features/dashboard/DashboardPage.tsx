@@ -4,6 +4,7 @@ import type { CaseData } from "../../app/useCaseData";
 // demo7
 // Reuse the shared visual component instead of a Dashboard-only badge.
 import Badge from "../../shared/components/Badge";
+import { useBookmarks } from "../../app/BookmarkContext";
 
 function CaseSummary({ caseData }: { caseData: CaseRecord }) {
   return (
@@ -100,14 +101,9 @@ function RecentTimelineList({ timeline }: { timeline: TimelineEvent[] }) {
   );
 }
 
-export default function DashboardPage({
-  data,
-  bookmarks,
-}: {
-  data: CaseData;
-  bookmarks: string[];
-}) {
-  // Derive the count from App's shared bookmark state instead of storing another copy.
+export default function DashboardPage({ data }: { data: CaseData }) {
+  const { bookmarks } = useBookmarks();
+  // Derive the count from the shared Context value instead of storing another copy.
   const bookmarkCount = bookmarks.length;
   const reviewedCount = data.evidence.filter(
     (item) => (item.status || "").toLowerCase() === "reviewed",

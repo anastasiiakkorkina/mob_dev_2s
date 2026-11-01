@@ -181,16 +181,26 @@ These checkboxes are for self-checking. Don't forget to do the actual checking o
 
 **Tasks**
 
-- [ ] Pick one piece of state from this exercise (bookmark state is a strong candidate, given Demo 6's prop-drilling question) and actually implement it via React Context, replacing the prop-drilled version.
-- [ ] Explain a short, honest decision: for _this specific app_, at its _current_ size, is Context actually the right call for this state, or is prop-drilling (or lifting state, without
+- [x] Pick one piece of state from this exercise (bookmark state is a strong candidate, given Demo 6's prop-drilling question) and actually implement it via React Context, replacing the prop-drilled version.
+- [x] Explain a short, honest decision: for _this specific app_, at its _current_ size, is Context actually the right call for this state, or is prop-drilling (or lifting state, without
       Context) good enough? Be ready to defend whichever answer you land on.
+
+  **DECISION:** Bookmark Context is reasonable because Dashboard, Evidence, and Workspace all need the same list, and Evidence also changes it. The app is still small, so passing props would also be manageable; Context is useful here but not required.
 
 **Questions** (depend on the tasks above)
 
-- [ ] What problem does Context actually solve? What does it _not_ solve (people sometimes expect it to behave like global state management. Where does that expectation break down)?
-- [ ] Revisit Demo 6's callback-depth question. Was prop drilling there actually a real problem
+- [x] What problem does Context actually solve? What does it _not_ solve (people sometimes expect it to behave like global state management. Where does that expectation break down)?
+
+  **ANSWER:** Context lets components read a value from a nearby provider without passing it through every layer as props. It does not manage updates or persistence by itself, and it is not a global store. In this app, `App` still owns and updates the bookmark state; Context only makes that value and callback available to its children.
+
+- [x] Revisit Demo 6's callback-depth question. Was prop drilling there actually a real problem
       (annoying, error-prone, worth solving) or a manageable one? What's your threshold for reaching for Context instead of just drilling one more level?
-- [ ] "Unnecessary global state" is explicitly named as a common problem. Could using Context here be an example of that, even though Context isn't technically the same as a global variable?
+
+  **ANSWER:** The note callback passed through three prop steps, which was manageable because there were few layers and only one page needed it. I would consider Context when many components in separate branches need the same value, or when several intermediate components only pass it along.
+
+- [x] "Unnecessary global state" is explicitly named as a common problem. Could using Context here be an example of that, even though Context isn't technically the same as a global variable?
+
+  **ANSWER:** It could be unnecessary if only one small component needed the bookmarks. Here several pages share the same bookmark list, so Context has a clear use. It is still scoped to the App provider tree, not available everywhere in the app automatically.
 
 ---
 

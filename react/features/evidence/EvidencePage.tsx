@@ -1,12 +1,11 @@
 import { useReducer } from "react";
 import type { EvidenceRecord, LocationRecord, PersonRecord } from "../../../modules/state";
+import { useBookmarks } from "../../app/BookmarkContext";
 
 interface Props {
   evidence: EvidenceRecord[];
   people: PersonRecord[];
   locations: LocationRecord[];
-  bookmarks: string[];
-  onToggleBookmark: (id: string) => void;
 }
 
 interface EvidenceFilters {
@@ -53,13 +52,8 @@ function evidenceFiltersReducer(
   }
 }
 
-export default function EvidencePage({
-  evidence,
-  people,
-  locations,
-  bookmarks,
-  onToggleBookmark,
-}: Props) {
+export default function EvidencePage({ evidence, people, locations }: Props) {
+  const { bookmarks, onToggleBookmark } = useBookmarks();
   // Store only user choices; the visible list is derived below from those choices and the source data.
   // One reducer owns all seven related search, filter, and sort choices.
   const [filters, dispatch] = useReducer(evidenceFiltersReducer, defaultFilters);

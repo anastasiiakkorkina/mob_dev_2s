@@ -4,6 +4,7 @@ import {
   type EvidenceRecord,
   type PersonRecord,
 } from "../../../modules/state";
+import { useBookmarks } from "../../app/BookmarkContext";
 
 interface HypothesisDraft {
   suspectId: string;
@@ -51,7 +52,6 @@ function loadHypothesis(): HypothesisDraft {
 interface Props {
   evidence: EvidenceRecord[];
   people: PersonRecord[];
-  bookmarks: string[];
   notes: Record<string, string>;
   onSaveNote: (id: string, text: string) => void;
 }
@@ -106,7 +106,8 @@ function NoteForm({ evidence, onSaveNote }: NoteFormProps) {
   );
 }
 
-export default function WorkspacePage({ evidence, people, bookmarks, notes, onSaveNote }: Props) {
+export default function WorkspacePage({ evidence, people, notes, onSaveNote }: Props) {
+  const { bookmarks } = useBookmarks();
   const [hypothesis, setHypothesis] = useState(loadHypothesis);
   const [hypothesisSaved, setHypothesisSaved] = useState(false);
 

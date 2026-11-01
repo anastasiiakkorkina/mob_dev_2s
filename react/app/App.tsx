@@ -10,35 +10,24 @@ import EvidencePage from "../features/evidence/EvidencePage";
 import WorkspacePage from "../features/workspace/WorkspacePage";
 import { useState } from "react";
 import { STORAGE_KEY_BOOKMARKS, STORAGE_KEY_NOTES } from "../../modules/state";
+import { BookmarkProvider } from "./BookmarkContext";
 
 interface AppRoutesProps {
   data: CaseData | null;
   error: string;
-  bookmarks: string[];
   notes: Record<string, string>;
-  onToggleBookmark: (id: string) => void;
   onSaveNote: (id: string, text: string) => void;
 }
 
 // demo8
 // Explicit routes replace manual hash listeners and currentView state.
-export function AppRoutes({
-  data,
-  error,
-  bookmarks,
-  notes,
-  onToggleBookmark,
-  onSaveNote,
-}: AppRoutesProps) {
+export function AppRoutes({ data, error, notes, onSaveNote }: AppRoutesProps) {
   const pending = error ? <p role="alert">{error}</p> : <p role="status">Loading case file…</p>;
 
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route
-        path="/dashboard"
-        element={data ? <DashboardPage data={data} bookmarks={bookmarks} /> : pending}
-      />
+      <Route path="/dashboard" element={data ? <DashboardPage data={data} /> : pending} />
       <Route path="/team" element={<Navigate to="/team/people" replace />} />
       {/* demo9: the matched personId is read and checked inside PersonDetailPage. */}
       <Route
@@ -90,8 +79,6 @@ export function AppRoutes({
               evidence={data.evidence}
               people={data.people}
               locations={data.locations}
-              bookmarks={bookmarks}
-              onToggleBookmark={onToggleBookmark}
             />
           ) : (
             pending
@@ -106,7 +93,6 @@ export function AppRoutes({
             <WorkspacePage
               evidence={data.evidence}
               people={data.people}
-              bookmarks={bookmarks}
               notes={notes}
               onSaveNote={onSaveNote}
             />
@@ -164,17 +150,12 @@ export default function App() {
 
   return (
     <>
-      <AppHeader />
-      <main id="app" className="app-main">
-        <AppRoutes
-          data={data}
-          error={error}
-          bookmarks={bookmarks}
-          notes={notes}
-          onToggleBookmark={toggleBookmark}
-          onSaveNote={saveNote}
-        />
-      </main>
+      <BookmarkProvider value={{ bookmarks, onToggleBookmark: toggleBookmark }}>
+        <AppHeader />
+        <main id="app" className="app-main">
+          <AppRoutes data={data} error={error} notes={notes} onSaveNote={saveNote} />
+        </main>
+      </BookmarkProvider>
       <footer className="app-footer">
         <p>
           Project ReMotion Investigation Portal — Research Center AI, Software and IT-Security of
