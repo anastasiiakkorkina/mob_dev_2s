@@ -98,13 +98,18 @@ These checkboxes are for self-checking. Don't forget to do the actual checking o
 
 **Tasks**
 
-- [ ] Implement the Evidence Catalogue's filtering/sorting so that the _filtered, sorted list is computed from_ the full evidence list and the current filter/sort state, every render. Never stored as its own separate piece of state that could drift out of sync.
-- [ ] Do the same for the Dashboard's bookmark count and the Workspace's bookmarked-items list: both should be derived from the same single source of truth for bookmarks, not duplicated state.
+- [x] Implement the Evidence Catalogue's filtering/sorting so that the _filtered, sorted list is computed from_ the full evidence list and the current filter/sort state, every render. Never stored as its own separate piece of state that could drift out of sync.
+- [x] Do the same for the Dashboard's bookmark count and the Workspace's bookmarked-items list: both should be derived from the same single source of truth for bookmarks, not duplicated state.
 
 **Questions** (depend on the tasks above)
 
-- [ ] What's the rule for deciding whether something belongs in `useState` versus being computed inline (or via `useMemo`) during render? Apply that rule to the filtered evidence list and justify your answer.
-- [ ] The vanilla app had two related bugs here: a dashboard bookmark count that could go stale (because it only re-rendered on a view's first visit), and a `filteredEvidence` variable that was sometimes literally the _same array reference_ as the master list. Explain, concretely, why deriving these values during render instead of storing them makes **both** of those bug classes structurally impossible, not just less likely.
+- [x] What's the rule for deciding whether something belongs in `useState` versus being computed inline (or via `useMemo`) during render? Apply that rule to the filtered evidence list and justify your answer.
+
+  **ANSWER:** I store values the user changes, such as search and filter choices. I compute the visible evidence list from those choices and the full evidence list during render because it can always be calculated from them. I would use `useMemo` only if this calculation became expensive; it would still be derived data, not a second source of truth.
+
+- [x] The vanilla app had two related bugs here: a dashboard bookmark count that could go stale (because it only re-rendered on a view's first visit), and a `filteredEvidence` variable that was sometimes literally the _same array reference_ as the master list. Explain, concretely, why deriving these values during render instead of storing them makes **both** of those bug classes structurally impossible, not just less likely.
+
+  **ANSWER:** The Dashboard count reads `data.bookmarks.length`, and Workspace filters evidence with the same `data.bookmarks` IDs. A bookmark update changes that one shared state, so React renders both values from the latest list. The filtered list is also calculated from the full evidence list on each render; it is never assigned back to the master list or kept as stored state that can become stale. Sorting runs on a copied filtered array, so the original evidence order stays unchanged.
 
 ---
 

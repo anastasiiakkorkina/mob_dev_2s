@@ -101,6 +101,8 @@ function RecentTimelineList({ timeline }: { timeline: TimelineEvent[] }) {
 }
 
 export default function DashboardPage({ data }: { data: CaseData }) {
+  // Read the current shared bookmark list instead of keeping a second count in state.
+  const bookmarkCount = data.bookmarks.length;
   const reviewedCount = data.evidence.filter(
     (item) => (item.status || "").toLowerCase() === "reviewed",
   ).length;
@@ -112,7 +114,7 @@ export default function DashboardPage({ data }: { data: CaseData }) {
         <StatCard value={data.evidence.length} label="Evidence items" />
         <StatCard value={data.people.length} label="People" />
         <StatCard value={data.locations.length} label="Locations" />
-        <StatCard value={data.bookmarks.length} label="Bookmarked" />
+        <StatCard value={bookmarkCount} label="Bookmarked" />
         <StatCard value={reviewedCount} label="Reviewed" />
       </div>
       <ReviewProgress reviewedCount={reviewedCount} totalCount={data.evidence.length} />

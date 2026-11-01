@@ -81,6 +81,7 @@ export default function WorkspacePage({ evidence, people, bookmarks, notes, onSa
       setHypothesisSaved(false);
     }
   }
+  // Derive bookmarked records from the same bookmark IDs used by the Dashboard and Evidence page.
   const bookmarked = evidence.filter((item) => bookmarks.includes(item.id));
   const savedNotes = evidence.filter((item) => notes[item.id]?.trim());
 
