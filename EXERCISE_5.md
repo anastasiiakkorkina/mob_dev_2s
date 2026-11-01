@@ -228,12 +228,19 @@ These checkboxes are for self-checking. Don't forget to do the actual checking o
 
 **Tasks**
 
-- [ ] Do a final sweep of the Evidence Catalogue and Workspace views (and re-check Dashboard/People & Locations/Timeline from Exercises 3–4) for any remaining direct DOM manipulation, e.g. `document.querySelector`, manual `classList` changes, `innerHTML`, anything not going through React's render, and remove it.
-- [ ] Confirm the whole app (all 5 views) now runs entirely on React state and props, with zero manual DOM manipulation anywhere.
+- [x] Do a final sweep of the Evidence Catalogue and Workspace views (and re-check Dashboard/People & Locations/Timeline from Exercises 3–4) for any remaining direct DOM manipulation, e.g. `document.querySelector`, manual `classList` changes, `innerHTML`, anything not going through React's render, and remove it.
+- [x] Confirm the whole app (all 5 views) now runs entirely on React state and props, with zero manual DOM manipulation anywhere.
+
+  **CHECK:** I searched the React app, including all five views. The only `document.getElementById` calls are in the two entry files to find the mount elements passed to `createRoot`; they do not build or change view content. The original vanilla portal remains a separate page.
 
 **Questions** (depend on the tasks above)
 
-- [ ] Show one state-management decision you made somewhere in this exercise (state ownership, `useState` vs. `useReducer`, prop drilling vs. Context, or something else) that you're not 100% sure was the right call. Explain the trade-off honestly, both directions.
-- [ ] Across Exercises 3–5, name one bug category from the _original_ vanilla app (Exercise 1's defect list) that is now, by construction, no longer possible in your React version — not just fixed, but structurally prevented. Explain why the React architecture rules it out.
+- [x] Show one state-management decision you made somewhere in this exercise (state ownership, `useState` vs. `useReducer`, prop drilling vs. Context, or something else) that you're not 100% sure was the right call. Explain the trade-off honestly, both directions.
+
+  **ANSWER:** I used Context for bookmarks. It keeps the same list available to Dashboard, Evidence, and Workspace without passing it through route props. However, there are only a few pages, so props could also work and would make the dependency explicit. Context is convenient here, but it may be more than this app needs right now.
+
+- [x] Across Exercises 3–5, name one bug category from the _original_ vanilla app (Exercise 1's defect list) that is now, by construction, no longer possible in your React version — not just fixed, but structurally prevented. Explain why the React architecture rules it out.
+
+  **ANSWER:** Mutating the master evidence array while sorting is structurally avoided. The Evidence view filters into a new array and sorts a copy with `slice().sort()`. It never calls `sort()` on the source array, so changing the display order cannot permanently replace the original evidence order.
 
 ---

@@ -7,6 +7,7 @@ import { HashRouter } from "react-router";
 const container = document.getElementById("react-root");
 if (!container) throw new Error("React root container is missing");
 
+// This lookup only connects React to its HTML mount point; React renders the app UI.
 createRoot(container).render(
   <StrictMode>
     <HashRouter>
