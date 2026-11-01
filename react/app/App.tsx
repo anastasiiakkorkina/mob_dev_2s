@@ -124,7 +124,7 @@ export default function App() {
     }
   });
 
-  // this function is passed down to EvidencePage and WorkspacePage, which call it when the user clicks a bookmark button.
+  // Pass this callback to the pages that can change the shared bookmark list.
   function toggleBookmark(id: string) {
     if (!data) return;
     const bookmarks = data.bookmarks.includes(id)

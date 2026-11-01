@@ -58,15 +58,20 @@ These checkboxes are for self-checking. Don't forget to do the actual checking o
 
 **Tasks**
 
-- [ ] Make the Evidence search box a controlled input (`value` + `onChange` backed by `useState`).
-- [ ] Make the entire hypothesis form (suspect select, nature select, evidence multi-select,
+- [x] Make the Evidence search box a controlled input (`value` + `onChange` backed by `useState`).
+- [x] Make the entire hypothesis form (suspect select, nature select, evidence multi-select,
       confidence range, explanation and alternative textareas) fully controlled.
-- [ ] Wire the "Save hypothesis draft" action to read from your controlled state and persist it (still to `localStorage` for now).
+- [x] Wire the "Save hypothesis draft" action to read from your controlled state and persist it (still to `localStorage` for now).
 
 **Questions** (depend on the tasks above)
 
-- [ ] What makes an input "controlled" versus "uncontrolled" in React? Show what happens if you try to type in one of your controlled inputs without wiring its `onChange` and explain, in terms of React's render cycle, _why_ that happens.
-- [ ] The hypothesis form has several different input types (select, multi-select, range, textarea). Did you use one `useState` per field, or a single object? Justify your choice — and note this question again once you get to Demo 7 (`useReducer`), which asks you to reconsider it for a different form.
+- [x] What makes an input "controlled" versus "uncontrolled" in React? Show what happens if you try to type in one of your controlled inputs without wiring its `onChange` and explain, in terms of React's render cycle, _why_ that happens.
+
+  **ANSWER:** A controlled input gets its `value` from React state and updates that state in `onChange`. An uncontrolled input keeps its value in the DOM. If I remove `onChange` from a controlled text input, I can try to type, but React still has the old state value. On the next render React puts that old value back, so the input looks read-only.
+
+- [x] The hypothesis form has several different input types (select, multi-select, range, textarea). Did you use one `useState` per field, or a single object? Justify your choice — and note this question again once you get to Demo 7 (`useReducer`), which asks you to reconsider it for a different form.
+
+  **ANSWER:** I use one `useState` object for the whole hypothesis draft. These fields belong to one draft and are saved together, so one object keeps them together. Each change copies the old object and changes one field. In Demo 7, `useReducer` may be clearer when a state area has more fields and more kinds of related actions.
 
 ---
 

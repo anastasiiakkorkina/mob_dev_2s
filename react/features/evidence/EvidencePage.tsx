@@ -16,6 +16,7 @@ export default function EvidencePage({
   bookmarks,
   onToggleBookmark,
 }: Props) {
+  // The input value always comes from React state.
   const [search, setSearch] = useState("");
   const query = search.trim().toLowerCase();
   const visible = evidence.filter((item) =>
