@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useReducer } from "react";
 import type { EvidenceRecord, LocationRecord, PersonRecord } from "../../../modules/state";
 
 interface Props {
@@ -16,8 +16,16 @@ interface EvidenceFilters {
   locationId: string;
   status: string;
   relevance: string;
-  sort: string;
+  sort: EvidenceSort;
 }
+
+type EvidenceSort = "date-desc" | "date-asc" | "title-asc" | "title-desc";
+type FilterKey = Exclude<keyof EvidenceFilters, "sort">;
+
+type EvidenceFilterAction =
+  | { type: "SET_FILTER"; key: FilterKey; value: string }
+  | { type: "SET_SORT"; sort: EvidenceSort }
+  | { type: "CLEAR_FILTERS" };
 
 const defaultFilters: EvidenceFilters = {
   search: "",
@@ -29,6 +37,22 @@ const defaultFilters: EvidenceFilters = {
   sort: "date-desc",
 };
 
+// Keep each filter transition in one place and always return a new state object.
+function evidenceFiltersReducer(
+  state: EvidenceFilters,
+  action: EvidenceFilterAction,
+): EvidenceFilters {
+  switch (action.type) {
+    case "SET_FILTER":
+      return { ...state, [action.key]: action.value };
+    case "SET_SORT":
+      return { ...state, sort: action.sort };
+    case "CLEAR_FILTERS":
+      // Reset every related filter together from the same defaults.
+      return { ...defaultFilters };
+  }
+}
+
 export default function EvidencePage({
   evidence,
   people,
@@ -37,9 +61,10 @@ export default function EvidencePage({
   onToggleBookmark,
 }: Props) {
   // Store only user choices; the visible list is derived below from those choices and the source data.
-  const [filters, setFilters] = useState<EvidenceFilters>({ ...defaultFilters });
-  function updateFilter<K extends keyof EvidenceFilters>(key: K, value: EvidenceFilters[K]) {
-    setFilters((current) => ({ ...current, [key]: value }));
+  // One reducer owns all seven related search, filter, and sort choices.
+  const [filters, dispatch] = useReducer(evidenceFiltersReducer, defaultFilters);
+  function updateFilter(key: FilterKey, value: string) {
+    dispatch({ type: "SET_FILTER", key, value });
   }
 
   const types = [...new Set(evidence.map((item) => item.type))].sort();
@@ -171,7 +196,9 @@ export default function EvidencePage({
           <select
             id="reactSortEvidence"
             value={filters.sort}
-            onChange={(event) => updateFilter("sort", event.target.value)}
+            onChange={(event) =>
+              dispatch({ type: "SET_SORT", sort: event.target.value as EvidenceSort })
+            }
           >
             <option value="date-desc">Newest first</option>
             <option value="date-asc">Oldest first</option>
@@ -181,7 +208,7 @@ export default function EvidencePage({
           <button
             type="button"
             className="btn btn-secondary"
-            onClick={() => setFilters({ ...defaultFilters })}
+            onClick={() => dispatch({ type: "CLEAR_FILTERS" })}
           >
             Clear filters
           </button>

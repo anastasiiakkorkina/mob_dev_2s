@@ -157,15 +157,23 @@ These checkboxes are for self-checking. Don't forget to do the actual checking o
 
 **Tasks**
 
-- [ ] Identify the Evidence Catalogue's combined filter state (search term, type, person, location, status, relevance, and sort order — 7+ related values that often change together or need to be reset together) as a single non-trivial state domain, and replace its `useState` calls with a single `useReducer`.
-- [ ] Implement at least 3 distinct action types (e.g. `SET_FILTER`, `SET_SORT`, `CLEAR_FILTERS`).
+- [x] Identify the Evidence Catalogue's combined filter state (search term, type, person, location, status, relevance, and sort order — 7+ related values that often change together or need to be reset together) as a single non-trivial state domain, and replace its `useState` calls with a single `useReducer`.
+- [x] Implement at least 3 distinct action types (e.g. `SET_FILTER`, `SET_SORT`, `CLEAR_FILTERS`).
 
 **Questions** (depend on the tasks above)
 
-- [ ] Why is this particular piece of state ("evidence filters") a better fit for `useReducer` than for a pile of individual `useState` calls? What specifically got easier once you switched?
-- [ ] Show your `CLEAR_FILTERS` action. How does a reducer make "reset several related values at once, consistently" easier to get right than resetting them individually?
-- [ ] Is `useReducer` fundamentally different from `useState`, or is `useState` essentially a
+- [x] Why is this particular piece of state ("evidence filters") a better fit for `useReducer` than for a pile of individual `useState` calls? What specifically got easier once you switched?
+
+  **ANSWER:** Search, filters, and sorting are seven related values used together. The reducer keeps their updates in one place and gives each change a clear action. This makes it easier to see and change how the filter state works.
+
+- [x] Show your `CLEAR_FILTERS` action. How does a reducer make "reset several related values at once, consistently" easier to get right than resetting them individually?
+
+  **ANSWER:** `CLEAR_FILTERS` returns a new copy of `defaultFilters`, including the search text and sort order. One action resets all seven values together, so I cannot forget to reset one separate state variable.
+
+- [x] Is `useReducer` fundamentally different from `useState`, or is `useState` essentially a
       special case of the same underlying idea? Justify your answer.
+
+  **ANSWER:** Both store state and cause a render when the state changes. `useState` gives a simple setter. `useReducer` uses a reducer to decide the next state from the current state and an action. It is useful when state has several related updates; it is not a different kind of state.
 
 ---
 
