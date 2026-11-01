@@ -127,10 +127,12 @@ export default function App() {
   // Pass this callback to the pages that can change the shared bookmark list.
   function toggleBookmark(id: string) {
     if (!data) return;
+    // Make a new array and data object so the previous React state stays untouched.
     const bookmarks = data.bookmarks.includes(id)
       ? data.bookmarks.filter((item) => item !== id)
       : [...data.bookmarks, id];
-    setData({ ...data, bookmarks });
+    const nextData = { ...data, bookmarks };
+    setData(nextData);
     localStorage.setItem(STORAGE_KEY_BOOKMARKS, JSON.stringify(bookmarks));
   }
 

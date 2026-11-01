@@ -79,14 +79,18 @@ These checkboxes are for self-checking. Don't forget to do the actual checking o
 
 **Tasks**
 
-- [ ] Find at least one place where your first instinct (or an early draft) would have mutated state directly (e.g. `evidence.bookmarked = true`, or pushing directly into a state array), and rewrite it as an immutable update.
-- [ ] Add a case to your bookmark toggle logic that specifically exercises this: toggling a bookmark must produce a _new_ array/object, not a mutated one.
+- [x] Find at least one place where your first instinct (or an early draft) would have mutated state directly (e.g. `evidence.bookmarked = true`, or pushing directly into a state array), and rewrite it as an immutable update.
+- [x] Add a case to your bookmark toggle logic that specifically exercises this: toggling a bookmark must produce a _new_ array/object, not a mutated one.
 
 **Questions** (depend on the tasks above)
 
-- [ ] Why does mutating state directly in React sometimes still appear to "work" on screen, but
+- [x] Why does mutating state directly in React sometimes still appear to "work" on screen, but
       cause real (possibly hard-to-track) bugs elsewhere? What is React actually comparing when it decides whether to re-render?
-- [ ] The original vanilla app had a real bug where sorting evidence mutated the master array via a shared reference, permanently losing the original order. Show how your React state update for the equivalent action (bookmark toggle, or sort, if you implement it) avoids that exact class of bug. Be specific about what's different, not just "React handles it."
+- [x] The original vanilla app had a real bug where sorting evidence mutated the master array via a shared reference, permanently losing the original order. Show how your React state update for the equivalent action (bookmark toggle, or sort, if you implement it) avoids that exact class of bug. Be specific about what's different, not just "React handles it."
+
+  **ANSWER:** React compares the old and new state values by identity (with `Object.is`). If I mutate an object and pass the same object back, React may see the same identity and skip a render. Other code can also hold that changed object, so it can see unexpected data. A screen may still appear to update after some other render, which makes this bug hard to find.
+
+  **ANSWER:** The old sort could sort an array that was also the master list, changing its original order. My bookmark update makes a fresh `bookmarks` array and a fresh data object with `{ ...data, bookmarks }`. It leaves `data.evidence` and the previous state unchanged. This avoids changing shared data by reference.
 
 ---
 
