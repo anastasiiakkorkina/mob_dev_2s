@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { STORAGE_KEY_BOOKMARKS } from "../../modules/state";
 import type {
   CaseRecord,
@@ -58,5 +58,5 @@ export function useCaseData() {
     return () => controller.abort();
   }, []);
 
-  return { data, error };
+  return { data, error, setData };
 }
