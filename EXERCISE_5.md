@@ -137,14 +137,19 @@ These checkboxes are for self-checking. Don't forget to do the actual checking o
 
 **Tasks**
 
-- [ ] From wherever you lifted bookmark state to (Demo 5), pass a callback (e.g. `onToggleBookmark`) down through props to every component that needs to trigger a change, rather than letting child components reach up and mutate anything themselves.
-- [ ] Do the same for at least one more interaction that needs to affect state owned by a parent (e.g. saving a note, or changing evidence review status from the detail view).
+- [x] From wherever you lifted bookmark state to (Demo 5), pass a callback (e.g. `onToggleBookmark`) down through props to every component that needs to trigger a change, rather than letting child components reach up and mutate anything themselves.
+- [x] Do the same for at least one more interaction that needs to affect state owned by a parent (e.g. saving a note, or changing evidence review status from the detail view).
 
 **Questions** (depend on the tasks above)
 
-- [ ] Why can't (or shouldn't) a deeply nested child component just directly modify state that lives in a distant ancestor? What does passing a callback down get you instead?
-- [ ] Trace one callback all the way from where it's defined (with the actual `useState` setter
+- [x] Why can't (or shouldn't) a deeply nested child component just directly modify state that lives in a distant ancestor? What does passing a callback down get you instead?
+
+  **ANSWER:** A child does not own the ancestor's state, and changing it directly would bypass React's update flow. A callback gives the child one clear action to request. The parent keeps control of the update and can also save it to local storage.
+
+- [x] Trace one callback all the way from where it's defined (with the actual `useState` setter
       inside it) down to the component that calls it. How many component layers does it pass through, and does that feel like "too many". Is prop drilling becoming a real problem here?
+
+  **ANSWER:** `saveNote` is defined in `App` and calls `setNotes`. It passes through `AppRoutes`, then `WorkspacePage`, then `NoteForm`, which calls it on submit: three prop steps. This is still manageable because the route is the only middle layer and there are few consumers. Context would be worth considering if many unrelated layers had to pass the callback.
 
 ---
 

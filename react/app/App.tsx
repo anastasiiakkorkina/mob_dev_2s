@@ -102,6 +102,7 @@ export function AppRoutes({
         path="/workspace"
         element={
           data ? (
+            // Pass the parent-owned save action through the route to the Workspace form.
             <WorkspacePage
               evidence={data.evidence}
               people={data.people}
@@ -155,6 +156,7 @@ export default function App() {
   }
 
   function saveNote(id: string, text: string) {
+    // Update the shared notes state immutably and persist the same new value.
     const updated = { ...notes, [id]: text };
     setNotes(updated);
     localStorage.setItem(STORAGE_KEY_NOTES, JSON.stringify(updated));

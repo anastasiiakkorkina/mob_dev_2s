@@ -56,17 +56,59 @@ interface Props {
   onSaveNote: (id: string, text: string) => void;
 }
 
-export default function WorkspacePage({ evidence, people, bookmarks, notes, onSaveNote }: Props) {
+interface NoteFormProps {
+  evidence: EvidenceRecord[];
+  onSaveNote: (id: string, text: string) => void;
+}
+
+// Keep temporary editor input local, then ask the App-owned callback to save it.
+function NoteForm({ evidence, onSaveNote }: NoteFormProps) {
   const [evidenceId, setEvidenceId] = useState(evidence[0]?.id ?? "");
   const [noteText, setNoteText] = useState("");
-  const [hypothesis, setHypothesis] = useState(loadHypothesis);
-  const [hypothesisSaved, setHypothesisSaved] = useState(false);
-  function handleNoteSubmit(event: FormEvent<HTMLFormElement>) {
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!evidenceId || !noteText.trim()) return;
     onSaveNote(evidenceId, noteText.trim());
     setNoteText("");
   }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="form-row">
+        <label htmlFor="noteEvidence">Evidence item</label>
+        <select
+          id="noteEvidence"
+          value={evidenceId}
+          onChange={(event) => setEvidenceId(event.target.value)}
+        >
+          {evidence.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.id} — {item.title}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="form-row">
+        <label htmlFor="workspaceNote">Investigator note</label>
+        <textarea
+          id="workspaceNote"
+          rows={3}
+          value={noteText}
+          onChange={(event) => setNoteText(event.target.value)}
+          placeholder="Add a private note…"
+        />
+      </div>
+      <button type="submit" className="btn btn-primary">
+        Save note
+      </button>
+    </form>
+  );
+}
+
+export default function WorkspacePage({ evidence, people, bookmarks, notes, onSaveNote }: Props) {
+  const [hypothesis, setHypothesis] = useState(loadHypothesis);
+  const [hypothesisSaved, setHypothesisSaved] = useState(false);
 
   // Keep the related hypothesis fields together as one draft object.
   function handleHypothesisSubmit(event: FormEvent<HTMLFormElement>) {
@@ -118,35 +160,7 @@ export default function WorkspacePage({ evidence, people, bookmarks, notes, onSa
               <p>No notes yet.</p>
             )}
           </div>
-          <form onSubmit={handleNoteSubmit}>
-            <div className="form-row">
-              <label htmlFor="noteEvidence">Evidence item</label>
-              <select
-                id="noteEvidence"
-                value={evidenceId}
-                onChange={(event) => setEvidenceId(event.target.value)}
-              >
-                {evidence.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.id} — {item.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="form-row">
-              <label htmlFor="workspaceNote">Investigator note</label>
-              <textarea
-                id="workspaceNote"
-                rows={3}
-                value={noteText}
-                onChange={(event) => setNoteText(event.target.value)}
-                placeholder="Add a private note…"
-              />
-            </div>
-            <button type="submit" className="btn btn-primary">
-              Save note
-            </button>
-          </form>
+          <NoteForm evidence={evidence} onSaveNote={onSaveNote} />
         </div>
       </div>
       <div className="hypothesis-card">
