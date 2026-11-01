@@ -208,14 +208,19 @@ These checkboxes are for self-checking. Don't forget to do the actual checking o
 
 **Tasks**
 
-- [ ] Review your own Evidence/Workspace/Dashboard code specifically for: duplicated state (the same fact represented in two places), stale state (a value that doesn't update when it should), excessive prop drilling, unnecessary global state, and any remaining direct mutation.
-- [ ] Find and fix at least 2 real instances (they can be ones you introduced yourself while
+- [x] Review your own Evidence/Workspace/Dashboard code specifically for: duplicated state (the same fact represented in two places), stale state (a value that doesn't update when it should), excessive prop drilling, unnecessary global state, and any remaining direct mutation.
+- [x] Find and fix at least 2 real instances (they can be ones you introduced yourself while
       building this exercise, that's normal and expected, not a failure).
 
 **Questions** (depend on the tasks above)
 
-- [ ] For each of the 2 issues you fixed: which of the five named categories did it fall into, and how did you notice it (a visible bug, a code-review-style re-read, React DevTools, something else)?
-- [ ] Of the five named problems (duplicated state, stale state, prop drilling, unnecessary global state, mutation), which one is this app's history (Exercise 1's bugs) most clearly an example of? Explain the connection directly.
+- [x] For each of the 2 issues you fixed: which of the five named categories did it fall into, and how did you notice it (a visible bug, a code-review-style re-read, React DevTools, something else)?
+
+  **ANSWER:** First, the hypothesis form kept showing “Saved” after I edited a field. This was stale UI state; a code review found that edits did not clear the confirmation. Now every field change updates the draft and clears the saved message. Second, the bookmark and note callbacks used values captured by the last App render. This was stale state; a code review showed queued updates could overwrite each other. They now use functional state setters, and effects persist the committed values. I also checked that the page sorting works on copied arrays and found no direct DOM changes in these React views.
+
+- [x] Of the five named problems (duplicated state, stale state, prop drilling, unnecessary global state, mutation), which one is this app's history (Exercise 1's bugs) most clearly an example of? Explain the connection directly.
+
+  **ANSWER:** Stale state is the clearest example. In the vanilla app, the Dashboard bookmark count could stay old because it only rendered on the view's first visit. The React version derives the count from the current shared bookmark state each time the Dashboard renders.
 
 ---
 

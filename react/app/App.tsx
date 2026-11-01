@@ -8,7 +8,7 @@ import TimelinePage from "../features/timeline/TimelinePage";
 import { useCaseData, type CaseData } from "./useCaseData";
 import EvidencePage from "../features/evidence/EvidencePage";
 import WorkspacePage from "../features/workspace/WorkspacePage";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { STORAGE_KEY_BOOKMARKS, STORAGE_KEY_NOTES } from "../../modules/state";
 import { BookmarkProvider } from "./BookmarkContext";
 
@@ -131,21 +131,25 @@ export default function App() {
     }
   });
 
+  // Persist each committed state value after React applies its update.
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_BOOKMARKS, JSON.stringify(bookmarks));
+  }, [bookmarks]);
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_NOTES, JSON.stringify(notes));
+  }, [notes]);
+
   // Pass this callback to the pages that can change the shared bookmark list.
   function toggleBookmark(id: string) {
-    // Make a new bookmark array so the previous state stays untouched.
-    const nextBookmarks = bookmarks.includes(id)
-      ? bookmarks.filter((item) => item !== id)
-      : [...bookmarks, id];
-    setBookmarks(nextBookmarks);
-    localStorage.setItem(STORAGE_KEY_BOOKMARKS, JSON.stringify(nextBookmarks));
+    // Use the latest state, even if React has queued more than one toggle before rendering.
+    setBookmarks((current) =>
+      current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
+    );
   }
 
   function saveNote(id: string, text: string) {
-    // Update the shared notes state immutably and persist the same new value.
-    const updated = { ...notes, [id]: text };
-    setNotes(updated);
-    localStorage.setItem(STORAGE_KEY_NOTES, JSON.stringify(updated));
+    // Merge into the latest notes object so queued saves do not overwrite each other.
+    setNotes((current) => ({ ...current, [id]: text }));
   }
 
   return (

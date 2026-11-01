@@ -111,6 +111,12 @@ export default function WorkspacePage({ evidence, people, notes, onSaveNote }: P
   const [hypothesis, setHypothesis] = useState(loadHypothesis);
   const [hypothesisSaved, setHypothesisSaved] = useState(false);
 
+  // Any draft edit makes the previous Saved confirmation out of date.
+  function updateHypothesis<K extends keyof HypothesisDraft>(key: K, value: HypothesisDraft[K]) {
+    setHypothesis((current) => ({ ...current, [key]: value }));
+    setHypothesisSaved(false);
+  }
+
   // Keep the related hypothesis fields together as one draft object.
   function handleHypothesisSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -172,9 +178,7 @@ export default function WorkspacePage({ evidence, people, notes, onSaveNote }: P
             <select
               id="hypSuspect"
               value={hypothesis.suspectId}
-              onChange={(event) =>
-                setHypothesis((current) => ({ ...current, suspectId: event.target.value }))
-              }
+              onChange={(event) => updateHypothesis("suspectId", event.target.value)}
             >
               <option value="">Select a person…</option>
               {people.map((person) => (
@@ -189,9 +193,7 @@ export default function WorkspacePage({ evidence, people, notes, onSaveNote }: P
             <select
               id="hypNature"
               value={hypothesis.nature}
-              onChange={(event) =>
-                setHypothesis((current) => ({ ...current, nature: event.target.value }))
-              }
+              onChange={(event) => updateHypothesis("nature", event.target.value)}
             >
               <option value="">Select…</option>
               <option value="accidental">Accidental</option>
@@ -207,10 +209,10 @@ export default function WorkspacePage({ evidence, people, notes, onSaveNote }: P
               size={6}
               value={hypothesis.evidenceIds}
               onChange={(event) =>
-                setHypothesis((current) => ({
-                  ...current,
-                  evidenceIds: Array.from(event.target.selectedOptions, (option) => option.value),
-                }))
+                updateHypothesis(
+                  "evidenceIds",
+                  Array.from(event.target.selectedOptions, (option) => option.value),
+                )
               }
             >
               {evidence.map((item) => (
@@ -228,9 +230,7 @@ export default function WorkspacePage({ evidence, people, notes, onSaveNote }: P
               min="0"
               max="100"
               value={hypothesis.confidence}
-              onChange={(event) =>
-                setHypothesis((current) => ({ ...current, confidence: event.target.value }))
-              }
+              onChange={(event) => updateHypothesis("confidence", event.target.value)}
             />
             <output htmlFor="hypConfidence">{hypothesis.confidence}</output>
           </div>
@@ -240,9 +240,7 @@ export default function WorkspacePage({ evidence, people, notes, onSaveNote }: P
               id="hypExplanation"
               rows={4}
               value={hypothesis.explanation}
-              onChange={(event) =>
-                setHypothesis((current) => ({ ...current, explanation: event.target.value }))
-              }
+              onChange={(event) => updateHypothesis("explanation", event.target.value)}
               placeholder="Explain your reasoning…"
             />
           </div>
@@ -252,9 +250,7 @@ export default function WorkspacePage({ evidence, people, notes, onSaveNote }: P
               id="hypAlternative"
               rows={3}
               value={hypothesis.alternative}
-              onChange={(event) =>
-                setHypothesis((current) => ({ ...current, alternative: event.target.value }))
-              }
+              onChange={(event) => updateHypothesis("alternative", event.target.value)}
               placeholder="What else could explain the evidence?"
             />
           </div>
