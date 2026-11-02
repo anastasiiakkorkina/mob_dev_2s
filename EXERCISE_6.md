@@ -123,14 +123,30 @@ often each one actually runs.
 
 **Tasks**
 
-- [ ] Implement at least one effect that sets up something needing cleanup (a `setTimeout`/
+- [x] Implement at least one effect that sets up something needing cleanup (a `setTimeout`/
 `setInterval`, a `window` event listener, or similar) and returns a proper cleanup function.
-- [ ] Demonstrate what happens (e.g. via a console log in both the effect and its cleanup) when the component unmounts or the dependencies change, with and without the cleanup function present.
+
+  **Demo:** Open `react.html#/_demo/cleanup` and the browser console. With **Enable timeout
+  cleanup** checked, press **Change delay and restart timer**: the console shows cleanup
+  cancelling the old timeout, then setup for the new delay. The old timeout does not fire. Leave
+  this route before the new timer fires to see cleanup on unmount. Then uncheck cleanup and change
+  the delay again before the timer fires: the old timeout remains scheduled and its “Timer fired”
+  message appears. With cleanup off, leaving the route also leaves the pending timeout active.
+  Strict Mode may show an extra setup and cleanup during the initial development check.
 
 **Questions** (depend on the tasks above)
 
-- [ ] What actually calls your cleanup function, and when? Name at least two distinct situations that trigger it.
-- [ ] What real, observable bug would you get in this app if you set up a subscription/timer in an effect but forgot the cleanup function? Be specific, not just "a memory leak."
+- [x] What actually calls your cleanup function, and when? Name at least two distinct situations that trigger it.
+
+  **ANSWER:** React calls the cleanup function returned by the effect. It calls it before running
+  the effect again when a dependency changes, and when the component unmounts. In development,
+  Strict Mode also runs an extra setup and cleanup cycle to check the effect.
+- [x] What real, observable bug would you get in this app if you set up a subscription/timer in an effect but forgot the cleanup function? Be specific, not just "a memory leak."
+
+  **ANSWER:** The cleanup demo shows the timer's message appearing after I change the delay or
+  leave its page. In a real view, an old delayed action could show a “saved” message after I left
+  Workspace or apply an earlier search after I entered a newer one. Clearing the timer stops work
+  that no longer belongs to the current view or current value.
 
 ---
 

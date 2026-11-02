@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { STORAGE_KEY_BOOKMARKS, STORAGE_KEY_NOTES } from "../../modules/state";
 import { BookmarkProvider } from "./BookmarkContext";
 import EffectRunsDemo from "../demos/EffectRunsDemo";
+import CleanupDemo from "../demos/CleanupDemo";
 import { views } from "./routing";
 
 interface AppRoutesProps {
@@ -30,6 +31,8 @@ export function AppRoutes({ data, error, notes, onSaveNote }: AppRoutesProps) {
     <Routes>
       {/* Keep the effect timing example available for a live classroom demonstration. */}
       <Route path="/_demo/effect-runs" element={<EffectRunsDemo />} />
+      {/* This route compares timer cleanup with a deliberately missing cleanup. */}
+      <Route path="/_demo/cleanup" element={<CleanupDemo />} />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/dashboard" element={data ? <DashboardPage data={data} /> : pending} />
       <Route path="/team" element={<Navigate to="/team/people" replace />} />
