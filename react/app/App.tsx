@@ -131,7 +131,8 @@ export default function App() {
     }
   });
 
-  // Persist each committed state value after React applies its update.
+  // Effects synchronize committed React state with browser storage outside render.
+  // Keeping these writes here avoids changing localStorage during a render attempt.
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_BOOKMARKS, JSON.stringify(bookmarks));
   }, [bookmarks]);

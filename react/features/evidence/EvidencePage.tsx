@@ -63,7 +63,9 @@ export default function EvidencePage({ evidence, people, locations }: Props) {
 
   const types = [...new Set(evidence.map((item) => item.type))].sort();
 
-  // Recompute filtering and sorting on every render, sorting a fresh array so the source order stays intact.
+  // This calculation only reads props and filter state and creates a new array.
+  // It is pure render work: the same inputs produce the same visible list.
+  // Recompute it on render and sort a copy so the source order stays intact.
   const query = filters.search.trim().toLowerCase();
   const visible = evidence
     .filter((item) => {
