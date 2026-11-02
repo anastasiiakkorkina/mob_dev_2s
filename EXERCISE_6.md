@@ -154,16 +154,32 @@ often each one actually runs.
 
 **Tasks**
 
-- [ ] Set up a minimal Node.js server (Express or equivalent) with one GET endpoint per data
+- [x] Set up a minimal Node.js server (Express or equivalent) with one GET endpoint per data
 resource (case, evidence, people, locations, timeline), each returning the same shape of data
 as the corresponding `data/*.json` file does today.
-- [ ] Add a way to deliberately simulate real-world conditions for testing later demos: an artificial delay (configurable, e.g. via a query param or env var) on at least one endpoint, and a way to make one endpoint return an error response (e.g. a 500) on demand.
-- [ ] Confirm the server runs locally alongside `vite dev` and is documented (a README section is enough) as dev-only (not part of the Exercise 2 deploy pipeline).
+- [x] Add a way to deliberately simulate real-world conditions for testing later demos: an artificial delay (configurable, e.g. via a query param or env var) on at least one endpoint, and a way to make one endpoint return an error response (e.g. a 500) on demand.
+- [x] Confirm the server runs locally alongside `vite dev` and is documented (a README section is enough) as dev-only (not part of the Exercise 2 deploy pipeline).
+
+  **Demo:** Run `npm run dev:api` and `npm run dev` in separate terminals. The API serves all five
+  resources under `/api/`. For example, `/api/evidence?delay=1500` waits 1.5 seconds and
+  `/api/evidence?fail=1` returns HTTP 500. The README explains that this API is local-only and
+  omitted from the static build/deployment.
 
 **Questions** (depend on the tasks above)
 
-- [ ] Why does this exercise ask for artificial delay/error controls on the backend, instead of just pointing the frontend at the static JSON files directly (as it already could)? What could you *not* teach convincingly without them?
-- [ ] What is CORS, and did you have to deal with it running your frontend (from Vite's dev server) against this separate backend server? If yes, what did you configure and why? If no, why not?
+- [x] Why does this exercise ask for artificial delay/error controls on the backend, instead of just pointing the frontend at the static JSON files directly (as it already could)? What could you *not* teach convincingly without them?
+
+  **ANSWER:** Static files usually load too quickly and do not provide a reliable way to trigger a
+  server error. The delay and failure controls let me demonstrate loading and error states, request
+  races, and cancellation on demand. Those behaviors would be difficult to reproduce reliably with
+  local files alone.
+- [x] What is CORS, and did you have to deal with it running your frontend (from Vite's dev server) against this separate backend server? If yes, what did you configure and why? If no, why not?
+
+  **ANSWER:** CORS is a browser rule that controls whether a page from one origin can read a
+  response from another origin. I did not need to add CORS headers: the frontend requests `/api/`
+  from the Vite origin, and Vite proxies that request to the local Node server. The browser sees a
+  same-origin request. Calling port 3001 directly from browser code would be a different origin
+  and would need CORS configuration.
 
 ---
 

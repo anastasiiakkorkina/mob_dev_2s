@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "tsc --noEmit && vite",
+    "dev:api": "node server/index.mjs",
     "build": "tsc --noEmit && vite build",
     "lint": "eslint app.ts modules react vite.config.mts",
     "lint:fix": "eslint app.ts modules react vite.config.mts --fix",

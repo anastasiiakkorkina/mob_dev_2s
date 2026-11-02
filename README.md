@@ -35,6 +35,34 @@ npx serve .
 
 Then open `http://localhost:8080` (or whatever port your server prints) in your browser.
 
+## Exercise 6: local development API
+
+The read-only Node API is for local development exercises only. It is not part of the static
+production build or a deployment server. Start it in one terminal:
+
+```bash
+npm run dev:api
+```
+
+Start the Vite frontend in a second terminal:
+
+```bash
+npm run dev
+```
+
+Vite forwards `/api/*` requests to the API on `127.0.0.1:3001`. The available GET endpoints are
+`/api/case`, `/api/evidence`, `/api/people`, `/api/locations`, and `/api/timeline`. Each endpoint
+returns the same JSON shape as its matching file in `data/`.
+
+To simulate a slow response, add `?delay=1500` (milliseconds), for example
+`/api/evidence?delay=1500`. To request a demonstration error, use
+`/api/evidence?fail=1`, which returns HTTP 500. `API_DELAY_MS` can set a default delay for all
+resources. The optional query delay is capped at 10 seconds.
+
+The Vite proxy keeps browser requests on the frontend's origin, so this development setup does not
+need CORS headers. The API binds to localhost and is not included in `vite build` or the static
+GitHub Pages deployment.
+
 ## Features
 
 - **Dashboard** — case summary and key statistics calculated from the loaded case data.
