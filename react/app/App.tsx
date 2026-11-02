@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router";
+import { Navigate, Route, Routes, useLocation } from "react-router";
 import AppHeader from "./AppHeader";
 import DashboardPage from "../features/dashboard/DashboardPage";
 import PeopleLocationsPage from "../features/people-locations/PeopleLocationsPage";
@@ -11,6 +11,8 @@ import WorkspacePage from "../features/workspace/WorkspacePage";
 import { useEffect, useState } from "react";
 import { STORAGE_KEY_BOOKMARKS, STORAGE_KEY_NOTES } from "../../modules/state";
 import { BookmarkProvider } from "./BookmarkContext";
+import EffectRunsDemo from "../demos/EffectRunsDemo";
+import { views } from "./routing";
 
 interface AppRoutesProps {
   data: CaseData | null;
@@ -26,6 +28,8 @@ export function AppRoutes({ data, error, notes, onSaveNote }: AppRoutesProps) {
 
   return (
     <Routes>
+      {/* Keep the effect timing example available for a live classroom demonstration. */}
+      <Route path="/_demo/effect-runs" element={<EffectRunsDemo />} />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/dashboard" element={data ? <DashboardPage data={data} /> : pending} />
       <Route path="/team" element={<Navigate to="/team/people" replace />} />
@@ -109,6 +113,19 @@ export function AppRoutes({ data, error, notes, onSaveNote }: AppRoutesProps) {
 }
 
 export default function App() {
+  // Read the current route so the browser tab title follows navigation.
+  const { pathname } = useLocation();
+  // Find the matching view label, including nested People routes.
+  const activeView = views.find(
+    (view) => view.path === pathname || (view.id === "people" && pathname.startsWith("/team/")),
+  );
+  // Keep the dependency as the exact title value used by the effect.
+  const pageTitle = `${activeView?.label ?? "Dashboard"} | Project ReMotion`;
+  // Update the browser document after React commits this route.
+  useEffect(() => {
+    document.title = pageTitle;
+  }, [pageTitle]);
+
   // The shell owns loaded data, so navigation does not reload the records.
   const { data, error } = useCaseData();
   // App is the lowest common owner of bookmark readers and the Evidence toggle action.

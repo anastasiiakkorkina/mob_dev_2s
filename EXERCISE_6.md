@@ -85,15 +85,37 @@ effect? Why or why not, and how does that distinction inform the rule you wrote?
 
 **Tasks**
 
-- [ ] Write a small `useEffect` example (can be a throwaway one first) with an empty dependency
+- [x] Write a small `useEffect` example (can be a throwaway one first) with an empty dependency
 array, one with a populated dependency array, and one with no array at all, and observe how
 often each one actually runs.
-- [ ] Find a real, justified use for `useEffect` you'll need in this app (loading data is coming in Demo 5, so pick something else — e.g. syncing the document title to the current view).
+
+  **Demo:** Open `react.html#/_demo/effect-runs`, then open the browser console and press
+  **Render again**. `EffectRunsDemo` logs one message for each dependency pattern. In development,
+  this app uses Strict Mode, so React does an extra initial effect setup/cleanup check: on mount
+  each of the three messages appears twice. After pressing the button, the empty-array effect does
+  not log again; the `[count]` effect logs once with the new count; and the no-array effect logs
+  once after the new render. In production, the initial setup runs once.
+- [x] Find a real, justified use for `useEffect` you'll need in this app (loading data is coming in Demo 5, so pick something else — e.g. syncing the document title to the current view).
+
+  **Use:** `App` syncs `document.title` with the current route. The browser title is outside
+  React's rendered page, so an effect updates it after the route commits. Its dependency is the
+  title string, so it updates when the user navigates to another view.
 
 **Questions** (depend on the tasks above)
 
-- [ ] What does React actually compare, between renders, to decide whether to re-run an effect with a populated dependency array? What happens if you omit a value your effect actually uses from that array?
-- [ ] What's the difference, in practice, between `useEffect(fn, [])` and just writing `fn()` directly in the component body? Why doesn't the second one work the way you'd expect for "run once"?
+- [x] What does React actually compare, between renders, to decide whether to re-run an effect with a populated dependency array? What happens if you omit a value your effect actually uses from that array?
+
+  **ANSWER:** React compares each dependency with its previous value using `Object.is`. If any
+  dependency changed, React runs the effect again after the render. If I omit a value the effect
+  reads, React may not run it when that value changes, so the effect can use an old value. I should
+  list every prop, state value, or component variable that the effect uses.
+- [x] What's the difference, in practice, between `useEffect(fn, [])` and just writing `fn()` directly in the component body? Why doesn't the second one work the way you'd expect for "run once"?
+
+  **ANSWER:** `useEffect(fn, [])` runs after React commits the component, and it does not run again
+  for later updates (apart from the extra development check in Strict Mode). Writing `fn()` in the
+  component body runs during every render, because React calls the component again when state or
+  props change. It is not a “run once” place, and an external action there could happen repeatedly
+  or while React is still deciding which UI to commit.
 
 ---
 
