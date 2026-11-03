@@ -56,7 +56,8 @@ returns the same JSON shape as its matching file in `data/`.
 
 To simulate a slow response, add `?delay=1500` (milliseconds), for example
 `/api/evidence?delay=1500`. To request a demonstration error, use
-`/api/evidence?fail=1`, which returns HTTP 500. `API_DELAY_MS` can set a default delay for all
+`/api/evidence?fail=1`, which returns HTTP 500. For a successful empty result, use
+`/api/evidence?empty=1`, which returns `[]`. `API_DELAY_MS` can set a default delay for all
 resources. The optional query delay is capped at 10 seconds.
 
 The Vite proxy keeps browser requests on the frontend's origin, so this development setup does not

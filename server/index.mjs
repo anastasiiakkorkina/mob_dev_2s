@@ -62,6 +62,13 @@ const server = createServer(async (request, response) => {
     return;
   }
 
+  // LAB6, demo 6. Return a valid empty list to exercise the successful empty state.
+  if (resourceName === "evidence" && requestUrl.searchParams.get("empty") === "1") {
+    response.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+    response.end("[]");
+    return;
+  }
+
   try {
     // Send the original parsed JSON so API responses match the static data shape.
     const contents = await readFile(resolve(dataDirectory, filename), "utf8");

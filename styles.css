@@ -199,6 +199,40 @@ a:focus-visible {
   border-top-color: var(--color-accent);
 }
 
+/* LAB6, demo 6. Give loading, errors, and empty results distinct visual treatments. */
+.case-state {
+  margin: 24px 0;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-panel);
+}
+
+.case-state--loading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-left: 5px solid var(--color-accent);
+}
+
+.case-state--loading .spinner {
+  flex: 0 0 auto;
+  margin: 0;
+  border-color: #d9e4fb;
+  border-top-color: var(--color-accent);
+}
+
+.case-state--error {
+  border-left: 5px solid var(--color-critical);
+  background: #fff7f6;
+}
+
+.case-state--empty {
+  grid-column: 1 / -1;
+  border-left: 5px solid var(--color-warn);
+  background: #fffbf2;
+}
+
 /* Dashboard */
 .stat-grid {
   display: grid;

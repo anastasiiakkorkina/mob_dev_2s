@@ -100,6 +100,12 @@ export default function EvidencePage({ evidence, people, locations }: Props) {
       return filters.sort === "date-asc" ? dateDifference : -dateDifference;
     });
 
+  // LAB6, demo 6. An empty API response is different from filters with no matches.
+  const emptyMessage =
+    evidence.length === 0
+      ? "No evidence records are available."
+      : "No evidence matches the current search and filters.";
+
   return (
     <section aria-labelledby="evidence-title">
       <h2 id="evidence-title">Evidence Catalogue</h2>
@@ -211,6 +217,13 @@ export default function EvidencePage({ evidence, people, locations }: Props) {
         </div>
       </div>
       <div className="evidence-grid">
+        {/* LAB6, demo 6. Render a clear empty state instead of a blank grid. */}
+        {visible.length === 0 && (
+          <div className="case-state case-state--empty" role="status">
+            <h3>{evidence.length === 0 ? "No evidence available" : "No matching evidence"}</h3>
+            <p>{emptyMessage}</p>
+          </div>
+        )}
         {visible.map((item) => {
           const isBookmarked = bookmarks.includes(item.id);
           return (
@@ -238,7 +251,6 @@ export default function EvidencePage({ evidence, people, locations }: Props) {
             </article>
           );
         })}
-        {visible.length === 0 && <p>No evidence matches this search.</p>}
       </div>
     </section>
   );

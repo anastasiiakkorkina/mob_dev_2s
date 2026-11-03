@@ -219,14 +219,33 @@ didn't need before?
 
 **Tasks**
 
-- [ ] For at least one view, implement all three states explicitly: a loading indicator while the fetch is pending, a real error message if it fails (using your backend's on-demand error endpoint from Demo 4 to trigger it live), and a distinct "no data" empty state if the response is successful but contains nothing.
-- [ ] Make sure these three states are visually and structurally distinguishable from each other, not all three collapsing into "shows nothing."
+- [x] For at least one view, implement all three states explicitly: a loading indicator while the fetch is pending, a real error message if it fails (using your backend's on-demand error endpoint from Demo 4 to trigger it live), and a distinct "no data" empty state if the response is successful but contains nothing.
+- [x] Make sure these three states are visually and structurally distinguishable from each other, not all three collapsing into "shows nothing."
+
+  **Demo:** Start the API and Vite in separate terminals. Open
+  `http://localhost:5173/react.html#/evidence?demo6=delay` to see the loading spinner before the
+  evidence arrives. Open `http://localhost:5173/react.html#/evidence?demo6=error` to request
+  `/api/evidence?fail=1` and see the red error panel with the server's error message. Open
+  `http://localhost:5173/react.html#/evidence?demo6=empty` to receive HTTP 200 with `[]` and see a
+  separate empty-state panel. If Vite uses a different port, replace `5173`. Remove `?demo6=...`
+  to return to the regular evidence list.
 
 **Questions** (depend on the tasks above)
 
-- [ ] Trigger your backend's error endpoint live and show the error state appearing. What state variable(s) are you tracking to distinguish "loading," "error," and "loaded successfully but empty" from each other?
-- [ ] The original vanilla app had a bug where a failed fetch could leave a loading spinner stuck forever because the cleanup/hide-loading step was never called on the error path. Explain specifically how your React version's state management makes that particular mistake
+- [x] Trigger your backend's error endpoint live and show the error state appearing. What state variable(s) are you tracking to distinguish "loading," "error," and "loaded successfully but empty" from each other?
+
+  **ANSWER:** `loading` is true while the requests are pending. `error` contains the HTTP failure
+  message when a request fails. `data` is set only after all requests succeed. If `data.evidence`
+  is an empty array, that is a successful response with no evidence, so the Evidence page shows a
+  separate empty message. The URL mode `demo6=error` calls the backend's `fail=1` endpoint and
+  displays the error panel.
+- [x] The original vanilla app had a bug where a failed fetch could leave a loading spinner stuck forever because the cleanup/hide-loading step was never called on the error path. Explain specifically how your React version's state management makes that particular mistake
 harder to make (or show that it doesn't, and fix it).
+
+  **ANSWER:** The hook stores loading as React state and sets it to false in `finally`, which runs
+  after both success and failure. The `catch` block stores the error message, and the UI displays
+  the error panel instead of the spinner. This makes it harder to forget to hide a spinner only on
+  the success path. Aborted requests do not change state because their effect is no longer active.
 
 ---
 

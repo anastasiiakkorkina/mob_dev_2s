@@ -5,7 +5,7 @@ import PeopleLocationsPage from "../features/people-locations/PeopleLocationsPag
 // demo9: a dynamic path identifies one person record.
 import PersonDetailPage from "../features/people-locations/PersonDetailPage";
 import TimelinePage from "../features/timeline/TimelinePage";
-import { useCaseData, type CaseData } from "./useCaseData";
+import { useCaseData, type CaseData, type CaseDataDemoMode } from "./useCaseData";
 import EvidencePage from "../features/evidence/EvidencePage";
 import WorkspacePage from "../features/workspace/WorkspacePage";
 import { useEffect, useState } from "react";
@@ -15,17 +15,35 @@ import EffectRunsDemo from "../demos/EffectRunsDemo";
 import CleanupDemo from "../demos/CleanupDemo";
 import { views } from "./routing";
 
+// LAB6, demo 6. Keep async status available to every data-backed route.
 interface AppRoutesProps {
   data: CaseData | null;
   error: string;
+  loading: boolean;
   notes: Record<string, string>;
   onSaveNote: (id: string, text: string) => void;
 }
 
 // demo8
 // Explicit routes replace manual hash listeners and currentView state.
-export function AppRoutes({ data, error, notes, onSaveNote }: AppRoutesProps) {
-  const pending = error ? <p role="alert">{error}</p> : <p role="status">Loading case file…</p>;
+// LAB6, demo 6. Keep loading and failure markup visibly distinct.
+export function AppRoutes({ data, error, loading, notes, onSaveNote }: AppRoutesProps) {
+  const pending = error ? (
+    <div className="case-state case-state--error" role="alert">
+      <h2>Could not load case data</h2>
+      <p>{error}</p>
+    </div>
+  ) : loading ? (
+    <div className="case-state case-state--loading" role="status" aria-live="polite">
+      <span className="spinner" aria-hidden="true" />
+      <p>Loading case file…</p>
+    </div>
+  ) : (
+    <div className="case-state case-state--error" role="alert">
+      <h2>Case data is unavailable</h2>
+      <p>Please reload the page and try again.</p>
+    </div>
+  );
 
   return (
     <Routes>
@@ -116,8 +134,15 @@ export function AppRoutes({ data, error, notes, onSaveNote }: AppRoutesProps) {
 }
 
 export default function App() {
+  // LAB6, demo 6. Read a demo mode from the current HashRouter query string.
+  const { pathname, search } = useLocation();
+  const requestedMode = new URLSearchParams(search).get("demo6");
+  const demoMode: CaseDataDemoMode =
+    requestedMode === "delay" || requestedMode === "error" || requestedMode === "empty"
+      ? requestedMode
+      : "normal";
+
   // Read the current route so the browser tab title follows navigation.
-  const { pathname } = useLocation();
   // Find the matching view label, including nested People routes.
   const activeView = views.find(
     (view) => view.path === pathname || (view.id === "people" && pathname.startsWith("/team/")),
@@ -130,7 +155,8 @@ export default function App() {
   }, [pageTitle]);
 
   // The shell owns loaded data, so navigation does not reload the records.
-  const { data, error } = useCaseData();
+  // LAB6, demo 6. Loading, error, and empty evidence use separate signals.
+  const { data, error, loading } = useCaseData(demoMode);
   // App is the lowest common owner of bookmark readers and the Evidence toggle action.
   const [bookmarks, setBookmarks] = useState<string[]>(() => {
     try {
@@ -178,7 +204,14 @@ export default function App() {
       <BookmarkProvider value={{ bookmarks, onToggleBookmark: toggleBookmark }}>
         <AppHeader />
         <main id="app" className="app-main">
-          <AppRoutes data={data} error={error} notes={notes} onSaveNote={saveNote} />
+          {/* LAB6, demo 6. Pass request state so routes can show loading or failure. */}
+          <AppRoutes
+            data={data}
+            error={error}
+            loading={loading}
+            notes={notes}
+            onSaveNote={saveNote}
+          />
         </main>
       </BookmarkProvider>
       <footer className="app-footer">
