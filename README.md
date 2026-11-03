@@ -61,7 +61,10 @@ resources. The optional query delay is capped at 10 seconds.
 
 The Vite proxy keeps browser requests on the frontend's origin, so this development setup does not
 need CORS headers. The API binds to localhost and is not included in `vite build` or the static
-GitHub Pages deployment.
+GitHub Pages deployment. The React preview now reads its case records from this API, so use both
+development commands above to run its data views. The vanilla app continues to read the static
+JSON files. A deployed React preview needs a separately configured backend URL, which is outside
+this exercise's deployment scope.
 
 ## Features
 

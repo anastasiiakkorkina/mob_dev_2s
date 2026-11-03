@@ -187,15 +187,31 @@ as the corresponding `data/*.json` file does today.
 
 **Tasks**
 
-- [ ] Replace at least one view's data source (previously the static `data/*.json` fetch/import) with a real `fetch()` call to your new backend, wired up inside a `useEffect`.
-- [ ] Do the same for the rest of the app's data sources, so the whole app now reads from your backend rather than static files.
+- [x] Replace at least one view's data source (previously the static `data/*.json` fetch/import) with a real `fetch()` call to your new backend, wired up inside a `useEffect`.
+- [x] Do the same for the rest of the app's data sources, so the whole app now reads from your backend rather than static files.
+
+  **Implementation:** `useCaseData` requests `/api/case`, `/api/evidence`, `/api/people`,
+  `/api/locations`, and `/api/timeline` in its effect. `Promise.all` starts the independent
+  requests together, and the result keeps the same data shape used by the pages.
 
 **Questions** (depend on the tasks above)
 
-- [ ] Walk through exactly what happens, in order, from the component mounting to the data actually being available to render: what does the effect do, when does it run, and what causes the component to re-render once the data arrives?
-- [ ] What's different about your component now compared to before (when data came from a static
+- [x] Walk through exactly what happens, in order, from the component mounting to the data actually being available to render: what does the effect do, when does it run, and what causes the component to re-render once the data arrives?
+
+  **ANSWER:** When `App` mounts, `useCaseData` first returns `data` as `null`. After the first
+  render commits, its effect creates an `AbortController` and starts five fetch requests. When all
+  responses arrive and are valid, `Promise.all` calls `setData` with the results. That state change
+  makes React render `App` again, and the pages receive the loaded records as props. If a request
+  fails, the hook sets an error instead; cleanup aborts requests if the app unmounts.
+- [x] What's different about your component now compared to before (when data came from a static
 import/fetch of a local file). Specifically in terms of what state it needs to track that it
 didn't need before?
+
+  **ANSWER:** A network response arrives later, so the app must keep the data while it is still
+  unavailable and record a failure if loading does not succeed. Here, `data === null` means the
+  records have not loaded yet, and `error` stores a failure message. The existing route UI shows a
+  loading message while data is null and an error message after failure. A static import is already
+  available during module loading and does not need this asynchronous state.
 
 ---
 
